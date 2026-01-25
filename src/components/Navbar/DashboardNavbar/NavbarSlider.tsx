@@ -9,6 +9,7 @@ import { navigation } from "@/constants/Navigation";
 import { useDispatch } from "react-redux";
 import logo from "@/assets/logo.svg";
 import Image from "next/image";
+import { useGetMeQuery } from "@/redux/api/auth";
 
 // Props
 interface SidebarProps {
@@ -27,19 +28,20 @@ const NavbarSlider = ({
   const path = usePathname();
   const router = useRouter();
   const dispatch = useDispatch();
+  const { data } = useGetMeQuery("");
 
   const handleLogOut = () => {
     dispatch(logout());
     Cookies.remove("token");
     router.push("/auth/login");
   };
-
+  const isAdmin = data?.data?.role === "ADMIN";
   // Sidebar content
   const sidebarContent = (
     <aside className="w-[240px] mt-0 md:mt-32 h-full bg-white flex flex-col justify-between font-inter z-[999]">
       <div className="pt-6">
         <ul className="ml-6">
-          {navigation?.map((item) => (
+          {isAdmin &&navigation?.map((item) => (
             <li key={item.route}>
               <Link
                 href={item.route}
@@ -60,7 +62,6 @@ const NavbarSlider = ({
           ))}
         </ul>
       </div>
-
       {/* Logout Button */}
       <div className="p-4">
         <button
@@ -86,6 +87,7 @@ const NavbarSlider = ({
           <span className="text-sm font-medium">Log out</span>
         </button>
       </div>
+
     </aside>
   );
 

@@ -39,10 +39,16 @@ const ForgotPassword = () => {
             token: res?.data?.data?.accessToken,
             user: res?.data?.data,
             isAuthenticated: true,
-          })
+          }),
         );
         toast.success("login successfully!");
-        router.push("/");
+        const role = res?.data?.data?.role;
+        const userId = res?.data?.data?.id;
+        if (role === "TRAINER") {
+          router.push(`/trainerDetail/${userId}`);
+        } else {
+          router.push("/");
+        }
       } else {
         const errorMessage =
           (res?.error &&

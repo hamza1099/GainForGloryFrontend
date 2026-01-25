@@ -11,6 +11,11 @@ const baseApiHandler = () => {
   return apiUrl;
 };
 
+export const imgBaseUrl = "http://localhost:6032/api/v1";
+// staging
+export const AgoraAppId = "6d30eac0cdda40978f14c634d0ca8561";
+export const AgoraAppKey = "1029e3311bca450a80f66af9044ec8ab";
+
 // Define the base API using RTK Query   v
 export const baseApi = createApi({
   reducerPath: "api",
