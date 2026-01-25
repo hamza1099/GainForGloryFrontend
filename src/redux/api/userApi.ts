@@ -21,6 +21,14 @@ const UsersApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
+    // UsersApi.ts mein build.query add karein
+    getUsersWithoutTrainer: build.query({
+      query: ({ page, limit }) => ({
+        url: `/user/users-without-trainer?page=${page}&limit=${limit}`,
+        method: "GET",
+      }),
+      providesTags: ["user"],
+    }),
 
     //update user status
     updateUserStatus: build.mutation({
@@ -68,5 +76,6 @@ export const {
   useGetUserRequestQuery,
   useAcceptUserRequestMutation,
   useBlockUserRequestMutation,
+  useGetUsersWithoutTrainerQuery,
 } = UsersApi;
 export default UsersApi;

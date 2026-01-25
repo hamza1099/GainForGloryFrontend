@@ -34,5 +34,6 @@ export const baseApi = createApi({
     "dashboard",
     "product",
     "order",
+    "trainer",
   ],
 });
