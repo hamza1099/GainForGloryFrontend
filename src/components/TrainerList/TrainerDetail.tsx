@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Mail,
   MapPin,
@@ -11,6 +11,7 @@ import {
   Loader2,
   Trash2,
   X,
+  Video,
 } from "lucide-react";
 import {
   useAssignTrainerMutation,
@@ -20,9 +21,13 @@ import {
 } from "@/redux/api/trainerApi";
 import { toast } from "react-toastify";
 import { useGetUsersWithoutTrainerQuery } from "@/redux/api/userApi";
+import { useGetMeQuery } from "@/redux/api/auth";
 
 const TrainerDetail = () => {
   const { id } = useParams() as { id: string };
+  const { data: authData } = useGetMeQuery("");
+  const router = useRouter();
+  const userRole = authData?.data?.role || "Admin";
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading } = useGetTrainerDetailQuery(id);
   const [isAssigning, setIsAssigning] = useState(false);
@@ -136,6 +141,9 @@ const TrainerDetail = () => {
     );
   };
 
+  const handleStartCall = (traineeId: string) => {
+    router.push(`/VideoChat/${traineeId}`);
+  };
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header / Profile Card */}
@@ -166,6 +174,9 @@ const TrainerDetail = () => {
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800">Assigned Trainees</h2>
+          {userRole === "ADMIN" && (
+
+
           <button
             onClick={handleToggleAssign}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -184,6 +195,7 @@ const TrainerDetail = () => {
               </>
             )}
           </button>
+          )}
         </div>
 
         {isAssigning && (
@@ -246,6 +258,14 @@ const TrainerDetail = () => {
                   <span className="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-400 uppercase tracking-wider font-bold">
                     ID: {trainee.id.slice(-6)}
                   </span>
+                  {userRole === "TRAINER" && (
+                    <button
+                      onClick={() => handleStartCall(trainee.id)}
+                      className=" absolute top-3.5 right-8 p-2 flex items-center gap-1 px-3 py-1 bg-[#f97316] text-white text-xs rounded-md hover:bg-green-600 transition-all mr-2"
+                    >
+                      <Video size={14} />Start Call
+                    </button>
+                  )}
                   <button
                     onClick={() => handleUnassign(trainee.id)}
                     className="absolute top-2 right-2 p-2 text-darkgray-300 hover:text-red-500 transition-colors"
@@ -253,9 +273,13 @@ const TrainerDetail = () => {
                   >
                     <Trash2 size={16} />
                   </button>
+                  <div>
+
                   <span className="text-xs text-green-500 font-medium">
                     {trainee.status}
                   </span>
+
+                  </div>
                 </div>
               </div>
             ))}

@@ -1,5 +1,6 @@
+"use client"
 import React, { useEffect } from "react";
-import logo from "../Assets/avatar_.png";
+import logo from "../../assets/avatar_.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMicrophone,
@@ -12,7 +13,7 @@ import Image from "next/image";
 type Props = {
   remoteUsers: any;
   studentsProfile: {
-    userId: number;
+    userId: number; 
     name: string;
     gender: string;
     email: string;

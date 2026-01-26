@@ -1,6 +1,6 @@
 import React from "react";
-import "../styles/VideoCallStyle.css";
-import logo from "../Assets/avatar_.png";
+import "../../Style/VideoCallStyle.css"
+import logo from "../../assets/avatar_.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMicrophoneSlash,

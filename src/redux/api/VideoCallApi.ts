@@ -4,13 +4,13 @@ const VideoCallApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     // 1. Get Call Ended Status
     // GET /session/callEnded?sessionId=...
-    getCallEnded: build.query<any, string>({
-      query: (sessionId) => ({
+    getCallEnded: build.mutation<any, { sessionId: string }>({
+      query: ({ sessionId }) => ({
+        // Template literal use karein taaki sessionId variable fetch ho sake
         url: `/session/callEnded?sessionId=${sessionId}`,
         method: "GET",
       }),
     }),
-
     // 2. Get Previous Sessions by User ID
     // GET /session/previousSessions?userId=...
     getPreviousSessions: build.query<any, string>({
@@ -23,13 +23,15 @@ const VideoCallApi = baseApi.injectEndpoints({
 
     // 3. Save Session Notes
     // POST /session/saveNotes
-    saveSessionNotes: build.mutation<any, { sessionId: string; notes: string }>({
-      query: (payload) => ({
-        url: `/session/saveNotes`,
-        method: "POST",
-        body: payload,
-      }),
-    }),
+    saveSessionNotes: build.mutation<any, { sessionId: string; notes: string }>(
+      {
+        query: (payload) => ({
+          url: `/session/saveNotes`,
+          method: "POST",
+          body: payload,
+        }),
+      },
+    ),
 
     // 4. Join Call
     // POST /session/joinCall
@@ -53,7 +55,7 @@ const VideoCallApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetCallEndedQuery,
+  useGetCallEndedMutation,
   useGetPreviousSessionsQuery,
   useSaveSessionNotesMutation,
   useJoinCallMutation,
