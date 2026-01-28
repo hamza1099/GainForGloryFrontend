@@ -261,12 +261,9 @@ const VideoCallScreen = () => {
       let response = await getCallEnded({
         sessionId: sessionId?.toString() || "",
       });
-      if (response.data === 0) {
+      if (response.data.isEnded) {
         setError(AppMessage.sessionExpire);
         handleLeaveChannel();
-      } else {
-        setSessionExpiryTime(response.data);
-        setCountdownTime(response.data);
       }
     } catch (err) {
       setError(AppMessage.requestFailed);
@@ -275,11 +272,11 @@ const VideoCallScreen = () => {
 
   const onPressLeaveCall = async () => {
     try {
-      let response = await leaveCall({
+      let response :any= await leaveCall({
         sessionId: sessionId?.toString() || "",
       });
 
-      if (response.data === "Success") {
+      if (response?.success) {
         setMsg(AppMessage.CallEnd);
         handleLeaveChannel();
       }

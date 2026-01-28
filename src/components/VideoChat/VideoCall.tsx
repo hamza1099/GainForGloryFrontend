@@ -152,7 +152,7 @@ const VideoCalling = (props: Props) => {
                       )}
                     </button>
 
-                    <button
+                    {/* <button
                       className={`${
                         props.isScreenSharing
                           ? "btn v_button screenshare_active"
@@ -163,7 +163,7 @@ const VideoCalling = (props: Props) => {
                       <FontAwesomeIcon
                         icon={faArrowUpFromBracket as IconProp}
                       />
-                    </button>
+                    </button> */}
                     {/* Hang_up_button */}
                     <button
                       className={`btn btn-phone v_button hang_btn ${

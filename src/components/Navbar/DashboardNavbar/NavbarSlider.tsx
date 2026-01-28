@@ -5,7 +5,7 @@ import { IoClose } from "react-icons/io5";
 import Cookies from "js-cookie";
 import { logout } from "@/redux/slices/authSlice";
 import { FiMenu } from "react-icons/fi";
-import { navigation } from "@/constants/Navigation";
+import { navigation, trainerNavigation } from "@/constants/Navigation";
 import { useDispatch } from "react-redux";
 import logo from "@/assets/logo.svg";
 import Image from "next/image";
@@ -41,25 +41,62 @@ const NavbarSlider = ({
     <aside className="w-[240px] mt-0 md:mt-32 h-full bg-white flex flex-col justify-between font-inter z-[999]">
       <div className="pt-6">
         <ul className="ml-6">
-          {isAdmin &&navigation?.map((item) => (
-            <li key={item.route}>
-              <Link
-                href={item.route}
-                onClick={() => isMobile && closeDrawer()}
-                className={`flex items-center gap-2 p-4 mb-2 text-base hover:bg-primaryColor hover:text-white rounded-sm transition
+          {isAdmin &&
+            navigation?.map((item) => (
+              <li key={item.route}>
+                <Link
+                  href={item.route}
+                  onClick={() => isMobile && closeDrawer()}
+                  className={`flex items-center gap-2 p-4 mb-2 text-base hover:bg-primaryColor hover:text-white rounded-sm transition
                   ${
                     path === item.route
                       ? "bg-primaryColor text-white"
                       : "text-[#747474]"
                   }`}
-              >
-                <span className="text-xl">
-                  {path === item.route ? item.whiteIcon : item.iconPath}
-                </span>
-                <span className="text-sm">{item.label}</span>
-              </Link>
-            </li>
-          ))}
+                >
+                  <span className="text-xl">
+                    {path === item.route ? item.whiteIcon : item.iconPath}
+                  </span>
+                  <span className="text-sm">{item.label}</span>
+                </Link>
+              </li>
+            ))}
+          {!isAdmin &&
+            trainerNavigation?.map((item) => {
+              // Check if the current path starts with the item's route (for dynamic IDs)
+              const isActive = path.startsWith(item.route);
+
+              return (
+                <li key={item.route}>
+                  {/* Agar path /trainerDetail/ se start ho raha hai toh Link ki jagah div render karein */}
+                  {path.startsWith("/trainerDetail/") &&
+                  item.route === "/trainerDetail/" ? (
+                    <div
+                      className={`flex items-center gap-2 p-4 mb-2 text-base rounded-sm transition bg-primaryColor text-white cursor-default`}
+                    >
+                      <span className="text-xl">{item.whiteIcon}</span>
+                      <span className="text-sm">{item.label}</span>
+                    </div>
+                  ) : (
+                    <Link
+                      href={item.route}
+                      onClick={() => isMobile && closeDrawer()}
+                      className={`flex items-center gap-2 p-4 mb-2 text-base hover:bg-primaryColor hover:text-white rounded-sm transition
+            ${
+              path === item.route
+                ? "bg-primaryColor text-white"
+                : "text-[#747474]"
+            }`}
+                    >
+                      <span className="text-xl">
+                        {path === item.route ? item.whiteIcon : item.iconPath}
+                      </span>
+                      <span className="text-sm">{item.label}</span>
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
         </ul>
       </div>
       {/* Logout Button */}
@@ -87,7 +124,6 @@ const NavbarSlider = ({
           <span className="text-sm font-medium">Log out</span>
         </button>
       </div>
-
     </aside>
   );
 
@@ -131,7 +167,7 @@ const NavbarSlider = ({
       )}
 
       {/* Desktop Sidebar */}
-      {!isMobile && sidebarContent}
+      {!isMobile && !path.startsWith("/VideoChat/") && sidebarContent}
     </>
   );
 };
