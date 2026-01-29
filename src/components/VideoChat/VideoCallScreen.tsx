@@ -21,6 +21,7 @@ import {
   useSaveSessionNotesMutation,
 } from "@/redux/api/VideoCallApi";
 import { useGetMeQuery } from "@/redux/api/auth";
+import RightSideBar from "./RightSideBar";
 
 type RemoteUser = {
   uid: string;
@@ -143,12 +144,15 @@ const VideoCallScreen = () => {
   const [leaveCall, { isLoading: isleaving }] = useLeaveCallMutation();
   const [getCallEnded, { isLoading: isGetCallEnded }] =
     useGetCallEndedMutation();
-  const { data, isLoading:PrevSessionLoader, refetch } = useGetPreviousSessionsQuery(id);
+  const {
+    data,
+    isLoading: PrevSessionLoader,
+    refetch,
+  } = useGetPreviousSessionsQuery(id);
 
   // Mutation hook
   const [saveSessionNotes, { isLoading, isSuccess, isError }] =
     useSaveSessionNotesMutation();
-
 
   // Update global screen and camera track references
   useEffect(() => {
@@ -226,11 +230,13 @@ const VideoCallScreen = () => {
     }
   }, [sessionExpiryTime, countdownTime]);
 
-
-   const handleSave = async (notes: string) => {
+  const handleSave = async (notes: string) => {
     try {
       // payload object me sessionId aur notes send karna
-      const response = await saveSessionNotes({ sessionId: sessionId?.toString() || "", notes }).unwrap();
+      const response = await saveSessionNotes({
+        sessionId: sessionId?.toString() || "",
+        notes,
+      }).unwrap();
       console.log("Notes saved:", response);
     } catch (error) {
       console.error("Failed to save notes:", error);
@@ -623,41 +629,48 @@ const VideoCallScreen = () => {
   };
 
   return (
-    <VideoCalling
-      isConnected={isConnected}
-      remoteUsers={remoteUsers}
-      onPressCalling={onPressCalling}
-      muteLocalAudio={onPressMic}
-      toggleScreenSharing={toggleScreenSharing}
-      onPressMic={onPressMic}
-      onPressCamera={onPressCamera}
-      calling={calling}
-      isScreenSharing={isScreenSharing}
-      micOn={micOn}
-      cameraOn={cameraOn}
-      localMicrophoneTrack={localMicrophoneTrack}
-      screenTrack={screenTrack}
-      localCameraTrack={localCameraTrack}
-      permissionsGranted={permissionsGranted}
-      showPermissionError={showPermissionError}
-      onPressPermissionsError={onPressPermissionsError}
-      isRemoteAudioOn={isRemoteAudioOn}
-      isRemoteVideoOn={isRemoteVideoOn}
-      error={error}
-      msg={msg}
-      remoteVideo={remoteVideo}
-      studentsProfile={studentsProfile}
-      isCountdownActive={isCountdownActive}
-      countdownTime={countdownTime}
-      toggleView={toggleView}
-      onPressToggleView={onPressToggleView}
-      remoteAudio={remoteAudio}
-      tutorProfile={tutorProfile}
-      onPressClose={onPressClose}
-      onPressConfirm={onPressConfirm}
-      showConfirmModal={showConfirmModal}
-      handleSave={handleSave}
-    />
+    <div className="flex justify-between">
+      <div className="w-[70%]">
+        <VideoCalling
+          isConnected={isConnected}
+          remoteUsers={remoteUsers}
+          onPressCalling={onPressCalling}
+          muteLocalAudio={onPressMic}
+          toggleScreenSharing={toggleScreenSharing}
+          onPressMic={onPressMic}
+          onPressCamera={onPressCamera}
+          calling={calling}
+          isScreenSharing={isScreenSharing}
+          micOn={micOn}
+          cameraOn={cameraOn}
+          localMicrophoneTrack={localMicrophoneTrack}
+          screenTrack={screenTrack}
+          localCameraTrack={localCameraTrack}
+          permissionsGranted={permissionsGranted}
+          showPermissionError={showPermissionError}
+          onPressPermissionsError={onPressPermissionsError}
+          isRemoteAudioOn={isRemoteAudioOn}
+          isRemoteVideoOn={isRemoteVideoOn}
+          error={error}
+          msg={msg}
+          remoteVideo={remoteVideo}
+          studentsProfile={studentsProfile}
+          isCountdownActive={isCountdownActive}
+          countdownTime={countdownTime}
+          toggleView={toggleView}
+          onPressToggleView={onPressToggleView}
+          remoteAudio={remoteAudio}
+          tutorProfile={tutorProfile}
+          onPressClose={onPressClose}
+          onPressConfirm={onPressConfirm}
+          showConfirmModal={showConfirmModal}
+          handleSave={handleSave}
+        />
+      </div>
+      <div className="w-[28%]">
+        <RightSideBar />
+      </div>
+    </div>
   );
 };
 
