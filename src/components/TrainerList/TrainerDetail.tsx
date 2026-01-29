@@ -32,6 +32,7 @@ const TrainerDetail = () => {
   const { data, isLoading } = useGetTrainerDetailQuery(id);
   const [isAssigning, setIsAssigning] = useState(false);
   const [selectedTrainee, setSelectedTrainee] = useState("");
+  const [startingCallId, setStartingCallId] = useState<string | null>(null);
 
   // API Call to get all trainees (to assign them)
   const {
@@ -142,6 +143,7 @@ const TrainerDetail = () => {
   };
 
   const handleStartCall = (traineeId: string) => {
+    setStartingCallId(traineeId);
     router.push(`/VideoChat/${traineeId}`);
   };
   return (
@@ -175,26 +177,24 @@ const TrainerDetail = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800">Assigned Trainees</h2>
           {userRole === "ADMIN" && (
-
-
-          <button
-            onClick={handleToggleAssign}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              isAssigning
-                ? "bg-gray-100 text-gray-600"
-                : "bg-secondaryColor text-white"
-            }`}
-          >
-            {isAssigning ? (
-              <>
-                <X size={18} /> Cancel
-              </>
-            ) : (
-              <>
-                <UserPlus size={18} /> Assign New
-              </>
-            )}
-          </button>
+            <button
+              onClick={handleToggleAssign}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                isAssigning
+                  ? "bg-gray-100 text-gray-600"
+                  : "bg-secondaryColor text-white"
+              }`}
+            >
+              {isAssigning ? (
+                <>
+                  <X size={18} /> Cancel
+                </>
+              ) : (
+                <>
+                  <UserPlus size={18} /> Assign New
+                </>
+              )}
+            </button>
           )}
         </div>
 
@@ -261,9 +261,20 @@ const TrainerDetail = () => {
                   {userRole === "TRAINER" && (
                     <button
                       onClick={() => handleStartCall(trainee.id)}
-                      className=" absolute top-3.5 right-8 p-2 flex items-center gap-1 px-3 py-1 bg-[#f97316] text-white text-xs rounded-md hover:bg-green-600 transition-all mr-2"
+                      disabled={startingCallId === trainee.id}
+                      className=" absolute top-3.5 right-8 p-2 flex items-center gap-1 px-3 py-1 bg-[#f97316] text-white text-xs rounded-md hover:bg-green-600 transition-all mr-2  disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      <Video size={14} />Start Call
+                      {startingCallId === trainee.id ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          Connecting...
+                        </>
+                      ) : (
+                        <>
+                          <Video size={14} />
+                          Start Call
+                        </>
+                      )}
                     </button>
                   )}
                   <button
@@ -274,11 +285,9 @@ const TrainerDetail = () => {
                     <Trash2 size={16} />
                   </button>
                   <div>
-
-                  <span className="text-xs text-green-500 font-medium">
-                    {trainee.status}
-                  </span>
-
+                    <span className="text-xs text-green-500 font-medium">
+                      {trainee.status}
+                    </span>
                   </div>
                 </div>
               </div>

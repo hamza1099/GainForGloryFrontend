@@ -10,7 +10,7 @@ import AgoraRTC, {
 
 import Cookies from "js-cookie";
 import VideoCalling from "./VideoCall";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import AppMessage from "@/constants/AppMessage";
 import { AgoraAppId } from "@/redux/api/baseApi";
 import {
@@ -76,6 +76,7 @@ const VideoCallScreen = () => {
   const _token = Cookies.get("token");
 
   const { id } = useParams() as { id: string };
+  const router = useRouter();
 
   const { data: authData } = useGetMeQuery("");
   const trainerInfo = authData?.data;
@@ -145,13 +146,13 @@ const VideoCallScreen = () => {
   const [getCallEnded, { isLoading: isGetCallEnded }] =
     useGetCallEndedMutation();
   const {
-    data,
+    data: previousSessions,
     isLoading: PrevSessionLoader,
     refetch,
   } = useGetPreviousSessionsQuery(id);
 
   // Mutation hook
-  const [saveSessionNotes, { isLoading, isSuccess, isError }] =
+  const [saveSessionNotes, { isLoading: saveLoader, isSuccess, isError }] =
     useSaveSessionNotesMutation();
 
   // Update global screen and camera track references
@@ -513,6 +514,7 @@ const VideoCallScreen = () => {
       setScreenTrack(null);
       // setIsScreenSharing(false);
       isScreenSharing = false;
+       router.push(`/trainerDetail/${trainerInfo.id}`);
     } catch (error) {
       console.error("Error leaving channel:", error);
     }
@@ -664,11 +666,17 @@ const VideoCallScreen = () => {
           onPressClose={onPressClose}
           onPressConfirm={onPressConfirm}
           showConfirmModal={showConfirmModal}
-          handleSave={handleSave}
         />
       </div>
       <div className="w-[28%]">
-        <RightSideBar />
+        <RightSideBar
+          handleSave={handleSave}
+          saveLoader={saveLoader}
+          isSuccess={isSuccess}
+          isError={isError}
+          PrevSessionLoader={PrevSessionLoader}
+          previousSessions={previousSessions}
+        />
       </div>
     </div>
   );
