@@ -15,8 +15,10 @@ import AppMessage from "@/constants/AppMessage";
 import { AgoraAppId } from "@/redux/api/baseApi";
 import {
   useGetCallEndedMutation,
+  useGetPreviousSessionsQuery,
   useJoinCallMutation,
   useLeaveCallMutation,
+  useSaveSessionNotesMutation,
 } from "@/redux/api/VideoCallApi";
 import { useGetMeQuery } from "@/redux/api/auth";
 
@@ -141,6 +143,12 @@ const VideoCallScreen = () => {
   const [leaveCall, { isLoading: isleaving }] = useLeaveCallMutation();
   const [getCallEnded, { isLoading: isGetCallEnded }] =
     useGetCallEndedMutation();
+  const { data, isLoading:PrevSessionLoader, refetch } = useGetPreviousSessionsQuery(id);
+
+  // Mutation hook
+  const [saveSessionNotes, { isLoading, isSuccess, isError }] =
+    useSaveSessionNotesMutation();
+
 
   // Update global screen and camera track references
   useEffect(() => {
@@ -218,6 +226,16 @@ const VideoCallScreen = () => {
     }
   }, [sessionExpiryTime, countdownTime]);
 
+
+   const handleSave = async (notes: string) => {
+    try {
+      // payload object me sessionId aur notes send karna
+      const response = await saveSessionNotes({ sessionId: sessionId?.toString() || "", notes }).unwrap();
+      console.log("Notes saved:", response);
+    } catch (error) {
+      console.error("Failed to save notes:", error);
+    }
+  };
   const remoteUserUnpublished = (user: any, mediaType: string) => {
     console.log("remoteUserUnpublished", mediaType, user);
     if (mediaType === "video") {
@@ -272,7 +290,7 @@ const VideoCallScreen = () => {
 
   const onPressLeaveCall = async () => {
     try {
-      let response :any= await leaveCall({
+      let response: any = await leaveCall({
         sessionId: sessionId?.toString() || "",
       });
 
@@ -318,7 +336,7 @@ const VideoCallScreen = () => {
     token: string,
     channel: string,
   ) => {
-    console.log("testCase==>",channel,tutorUid,token)
+    console.log("testCase==>", channel, tutorUid, token);
     if (hasPermissions) {
       try {
         agoraEngineRef.current?.on("connection-state-change", (state) => {
@@ -638,6 +656,7 @@ const VideoCallScreen = () => {
       onPressClose={onPressClose}
       onPressConfirm={onPressConfirm}
       showConfirmModal={showConfirmModal}
+      handleSave={handleSave}
     />
   );
 };

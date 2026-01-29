@@ -66,6 +66,7 @@ type Props = {
   onPressConfirm: () => void;
   onPressClose: () => void;
   showConfirmModal: boolean;
+  handleSave: (notes: string) => Promise<void>
 };
 
 const VideoCalling = (props: Props) => {
