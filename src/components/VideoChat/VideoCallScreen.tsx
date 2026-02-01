@@ -16,6 +16,7 @@ import { AgoraAppId } from "@/redux/api/baseApi";
 import {
   useGetCallEndedMutation,
   useGetPreviousSessionsQuery,
+  useHeartBeatCallMutation,
   useJoinCallMutation,
   useLeaveCallMutation,
   useSaveSessionNotesMutation,
@@ -144,6 +145,7 @@ const VideoCallScreen = () => {
 
   const [joinCall, { isLoading: iscalling }] = useJoinCallMutation();
   const [leaveCall, { isLoading: isleaving }] = useLeaveCallMutation();
+  const [heartBeatCall] = useHeartBeatCallMutation();
   const [getCallEnded, { isLoading: isGetCallEnded }] =
     useGetCallEndedMutation();
   const {
@@ -207,9 +209,15 @@ const VideoCallScreen = () => {
   useEffect(() => {
     if (isConnected) {
       getsessionEndingDetail();
-      const intervalId = setInterval(getsessionEndingDetail, 30000);
+      getHeartBeat();
 
-      return () => clearInterval(intervalId);
+      const intervalId = setInterval(getsessionEndingDetail, 30000);
+      const heartBeatInterval = setInterval(getHeartBeat, 10000);
+
+      return () => {
+        clearInterval(intervalId);
+        clearInterval(heartBeatInterval);
+      };
     }
   }, [isConnected]);
 
@@ -298,6 +306,15 @@ const VideoCallScreen = () => {
       }
     } catch (err) {
       setError(AppMessage.requestFailed);
+    }
+  };
+  const getHeartBeat = async () => {
+    try {
+      let response = await heartBeatCall({
+        sessionId: sessionId?.toString() || "",
+      });
+    } catch (err) {
+      // setError(AppMessage.requestFailed);
     }
   };
 

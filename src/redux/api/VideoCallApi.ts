@@ -51,6 +51,15 @@ const VideoCallApi = baseApi.injectEndpoints({
         body: payload,
       }),
     }),
+
+        // 6. Heart beat Call (Jo humne pehle banaya tha)
+    heartBeatCall: build.mutation<any, { sessionId: string }>({
+      query: (payload) => ({
+        url: `/session/heartbeat`,
+        method: "POST",
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -60,6 +69,8 @@ export const {
   useSaveSessionNotesMutation,
   useJoinCallMutation,
   useLeaveCallMutation,
+  useHeartBeatCallMutation,
+
 } = VideoCallApi;
 
 export default VideoCallApi;
