@@ -33,7 +33,7 @@ const TrainerList = () => {
     gender: "MALE",
     location: "",
     password: "",
-    image: null as File | null,
+    // image: null as File | null,
   });
 
   const { data, isLoading, refetch } = useGetAllTrainersQuery({
@@ -64,7 +64,7 @@ const TrainerList = () => {
         gender: trainer.gender,
         location: trainer.location,
         password: "", // Usually keep password empty on update
-        image: null as File | null,
+        // image: null as File | null,
       });
     } else {
       setEditingTrainer(null);
@@ -74,7 +74,7 @@ const TrainerList = () => {
         gender: "MALE",
         location: "",
         password: "",
-        image: null as File | null,
+        // image: null as File | null,
       });
     }
     setIsModalOpen(true);
@@ -90,10 +90,10 @@ const TrainerList = () => {
       } else {
         setMsgError(null);
       }
-      if (!formData.image) {
-        setMsgError("Please upload an image for the trainer");
-        return;
-      }
+      // if (!formData.image) {
+      //   setMsgError("Please upload an image for the trainer");
+      //   return;
+      // }
       const payload = new FormData();
       // loop through formData keys
       Object.entries(formData).forEach(([key, value]) => {
@@ -115,7 +115,7 @@ const TrainerList = () => {
         gender: "MALE",
         location: "",
         password: "",
-        image: null,
+        // image: null,
       });
     } catch (error: any) {
       console.error("Operation failed", error);
@@ -418,7 +418,7 @@ const TrainerList = () => {
               </div>
 
               {/* )} */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium mb-1">Image</label>
                 <input
                   type="file"
@@ -437,7 +437,7 @@ const TrainerList = () => {
                     className="mt-2 w-20 h-20 rounded-full object-cover"
                   />
                 )}
-              </div>
+              </div> */}
                {msgError && (
                 <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm font-medium animate-shake">
                   {msgError}
