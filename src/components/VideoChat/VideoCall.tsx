@@ -1,5 +1,5 @@
 import React from "react";
-import "../../Style/VideoCallStyle.css"
+import "../../Style/VideoCallStyle.css";
 import logo from "../../assets/avatar_.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -62,7 +62,7 @@ type Props = {
   toggleView: boolean;
   onPressToggleView: () => void;
   remoteAudio: boolean;
-  tutorProfile: any;
+  trainerProfile: any;
   onPressConfirm: () => void;
   onPressClose: () => void;
   showConfirmModal: boolean;
@@ -86,7 +86,7 @@ const VideoCalling = (props: Props) => {
                 }`}
               >
                 <h1>{`Session expires in: ${formatTime(
-                  props.countdownTime
+                  props.countdownTime,
                 )}`}</h1>
               </div>
             )}
@@ -99,14 +99,8 @@ const VideoCalling = (props: Props) => {
                   audioTrack={props.localMicrophoneTrack}
                   cameraOn={props.cameraOn}
                   micOn={props.micOn}
-                  videoTrack={
-                    props.isScreenSharing && props.screenTrack
-                      ? props.screenTrack[0]
-                      : props.localCameraTrack
-                  }
-                  cover={
-                    props.tutorProfile?.img ? props.tutorProfile?.img : logo
-                  }
+                  videoTrack={props.localCameraTrack}
+                  cover={logo.src}
                   playAudio={false}
                 ></LocalUser>
               ) : (
@@ -137,7 +131,7 @@ const VideoCalling = (props: Props) => {
                         </>
                       )}
                     </button>
-                    <button
+                    {/* <button
                       className="btn v_button"
                       onClick={() => props.onPressCamera((a: any) => !a)}
                     >
@@ -149,6 +143,17 @@ const VideoCalling = (props: Props) => {
                         <>
                           <FontAwesomeIcon icon={faVideo as IconProp} />
                         </>
+                      )}
+                    </button> */}
+                    <button
+                      className="btn v_button"
+                      // Pehle yahan function pass ho raha tha, ab value pass hogi
+                      onClick={() => props.onPressCamera(!props.cameraOn)}
+                    >
+                      {!props.cameraOn ? (
+                        <FontAwesomeIcon icon={faVideoSlash as IconProp} />
+                      ) : (
+                        <FontAwesomeIcon icon={faVideo as IconProp} />
                       )}
                     </button>
 
@@ -200,14 +205,8 @@ const VideoCalling = (props: Props) => {
                     audioTrack={props.localMicrophoneTrack}
                     cameraOn={props.cameraOn}
                     micOn={props.micOn}
-                    videoTrack={
-                      props.isScreenSharing && props.screenTrack
-                        ? props.screenTrack[0]
-                        : props.localCameraTrack
-                    }
-                    cover={
-                      props.tutorProfile?.img ? props.tutorProfile?.img : logo
-                    }
+                    videoTrack={props.localCameraTrack}
+                    cover={logo.src}
                     playAudio={false}
                   ></LocalUser>
                 )}

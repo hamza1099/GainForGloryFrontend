@@ -22,6 +22,7 @@ import {
 } from "@/redux/api/VideoCallApi";
 import { useGetMeQuery } from "@/redux/api/auth";
 import RightSideBar from "./RightSideBar";
+import { set } from "react-hook-form";
 
 type RemoteUser = {
   uid: string;
@@ -125,7 +126,7 @@ const VideoCallScreen = () => {
   const [msg, setMsg] = useState<string | null>("");
 
   // State for managing student and tutor profiles
-  const [tutorProfile, setTutorProfile] = useState<TutorProfile | null>(null);
+  const [trainerProfile, setTrainerProfile] = useState<any | null>(null);
   const [studentsProfile, setStudentsProfile] = useState<StudentProfile[]>([]);
 
   // Reference to the Agora engine (RTC client)
@@ -170,6 +171,12 @@ const VideoCallScreen = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (authData?.data) {
+      setTrainerProfile(authData.data);
+      console.log("Trainer Profile Set:", authData.data);
+    }
+  }, [authData]);
   // Fetch Agora user info if token and permissions are available
   useEffect(() => {
     if (_token && hasPermissions) {
@@ -266,7 +273,6 @@ const VideoCallScreen = () => {
           ...prevProfiles,
           updatedProfile,
         ]);
-        setTutorProfile(trainerInfo);
 
         setMsg(AppMessage.waitMsg);
         sessionId = response.data.sessionId;
@@ -514,7 +520,7 @@ const VideoCallScreen = () => {
       setScreenTrack(null);
       // setIsScreenSharing(false);
       isScreenSharing = false;
-       router.push(`/trainerDetail/${trainerInfo.id}`);
+      router.push(`/trainerDetail/${trainerInfo.id}`);
     } catch (error) {
       console.error("Error leaving channel:", error);
     }
@@ -662,7 +668,7 @@ const VideoCallScreen = () => {
           toggleView={toggleView}
           onPressToggleView={onPressToggleView}
           remoteAudio={remoteAudio}
-          tutorProfile={tutorProfile}
+          trainerProfile={trainerProfile}
           onPressClose={onPressClose}
           onPressConfirm={onPressConfirm}
           showConfirmModal={showConfirmModal}
