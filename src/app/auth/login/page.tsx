@@ -41,14 +41,15 @@ const ForgotPassword = () => {
             isAuthenticated: true,
           }),
         );
-        toast.success("login successfully!");
         const role = res?.data?.data?.role;
+        console.log(role)
         const userId = res?.data?.data?.id;
         if (role === "TRAINER") {
           router.push(`/trainerDetail/${userId}`);
         } else {
-          router.push("/");
+          router.push("/")
         }
+        
       } else {
         const errorMessage =
           (res?.error &&
