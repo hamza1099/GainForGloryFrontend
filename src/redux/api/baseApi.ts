@@ -5,13 +5,13 @@ import Cookies from "js-cookie";
 // Utility function to handle the base API URL
 const baseApiHandler = () => {
   // const apiUrl = "http://82.180.161.133:6032/api/v1";
-  const apiUrl = "https://api.nazir.info/api/v1";
-  // const apiUrl = "http://localhost:6032/api/v1";
+  // const apiUrl = "https://api.nazir.info/api/v1";
+  const apiUrl = "http://localhost:6032/api/v1";
 
   return apiUrl;
 };
 
-export const imgBaseUrl = "https://api.nazir.info/api/v1";
+export const imgBaseUrl = "http://localhost:6032/api/v1";
 // staging
 export const AgoraAppId = "6d30eac0cdda40978f14c634d0ca8561";
 export const AgoraAppKey = "1029e3311bca450a80f66af9044ec8ab";

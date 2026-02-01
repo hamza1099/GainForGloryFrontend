@@ -66,6 +66,7 @@ const AllUserTable = () => {
               <th className="py-2 px-4">Email</th>
               <th className="py-2 px-4">Phone</th>
               <th className="py-2 px-4">Location</th>
+              <th className="py-2 px-4">Role</th>
               <th className="py-2 px-4 ">Subscription</th>
               <th className="py-2 px-4 ">Point</th>
               <th className="py-2 px-4">Status</th>
@@ -113,6 +114,8 @@ const AllUserTable = () => {
                   <td className="py-2 px-4">{info?.email || "N/A"}</td>
                   <td className="py-2 px-4">{info?.phone || "N/A"}</td>
                   <td className="py-2 px-4">{info?.location || "N/A"}</td>
+                  <td className="py-2 px-4">{info?.role || "N/A"}</td>
+
 
                   <td className="py-2 px-4">{info?.subscription}</td>
                   <td className="py-2 px-4 ">{info?.referPoint}</td>

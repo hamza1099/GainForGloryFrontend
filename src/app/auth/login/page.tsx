@@ -48,6 +48,7 @@ const ForgotPassword = () => {
           router.push(`/trainerDetail/${userId}`);
         } else {
           router.push("/")
+          router.refresh();
         }
         
       } else {

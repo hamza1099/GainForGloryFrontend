@@ -1,13 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Pagination from "../ui/Pagination";
-import {
-  ChevronDownIcon,
-  Edit,
-  Trash2,
-  Plus,
-  Loader2,
-} from "lucide-react";
+import { ChevronDownIcon, Edit, Trash2, Plus, Loader2 } from "lucide-react";
 import {
   useGetAllTrainersQuery,
   useUpdateTrainerStatusMutation,
@@ -17,6 +11,8 @@ import {
 } from "@/redux/api/trainerApi";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { validatePassword } from "@/constants/CommonFunctions";
+import { imgBaseUrl } from "@/redux/api/baseApi";
 
 type TrainerStatus = "ACTIVE" | "PENDING" | "BLOCKED";
 const options = [
@@ -30,12 +26,14 @@ const TrainerList = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [editingTrainer, setEditingTrainer] = useState<any>(null);
   const [statusMap, setStatusMap] = useState<{ [key: string]: string }>({});
+  const [msgError, setMsgError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     gender: "MALE",
     location: "",
     password: "",
+    image: null as File | null,
   });
 
   const { data, isLoading, refetch } = useGetAllTrainersQuery({
@@ -66,6 +64,7 @@ const TrainerList = () => {
         gender: trainer.gender,
         location: trainer.location,
         password: "", // Usually keep password empty on update
+        image: null as File | null,
       });
     } else {
       setEditingTrainer(null);
@@ -75,6 +74,7 @@ const TrainerList = () => {
         gender: "MALE",
         location: "",
         password: "",
+        image: null as File | null,
       });
     }
     setIsModalOpen(true);
@@ -83,14 +83,40 @@ const TrainerList = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const pwdError = validatePassword(formData.password);
+      if (pwdError) {
+        setMsgError(pwdError);
+        return;
+      } else {
+        setMsgError(null);
+      }
+      if (!formData.image) {
+        setMsgError("Please upload an image for the trainer");
+        return;
+      }
+      const payload = new FormData();
+      // loop through formData keys
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null) {
+          payload.append(key, value as any); // File ya string dono ho sakta
+        }
+      });
       if (editingTrainer) {
-        await updateTrainer({ id: editingTrainer.id, data: formData }).unwrap();
+        await updateTrainer({ id: editingTrainer.id, data: payload }).unwrap();
         toast.success("Trainer updated successfully");
       } else {
-        await createTrainer(formData).unwrap();
+        await createTrainer(payload).unwrap();
         toast.success("Trainer created successfully");
       }
       setIsModalOpen(false);
+      setFormData({
+        name: "",
+        email: "",
+        gender: "MALE",
+        location: "",
+        password: "",
+        image: null,
+      });
     } catch (error: any) {
       console.error("Operation failed", error);
       const msg =
@@ -229,8 +255,8 @@ const TrainerList = () => {
                     <Link
                       href={`/trainerDetail/${info.id}`}
                       className="text-secondaryColor hover:underline font-semibold"
-                      >
-                        {info.name}
+                    >
+                      {info.name}
                     </Link>
                   </td>
                   <td className="py-2 px-4">{info.email}</td>
@@ -375,20 +401,46 @@ const TrainerList = () => {
                   />
                 </div>
               </div>
-              {!editingTrainer && (
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Password
-                  </label>
-                  <input
-                    required
-                    type="password"
-                    className="w-full border rounded-lg px-3 py-2 outline-none"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
+              {/* {!editingTrainer && ( */}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Password
+                </label>
+                <input
+                  required
+                  type="password"
+                  className="w-full border rounded-lg px-3 py-2 outline-none"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                />
+              </div>
+
+              {/* )} */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setFormData({ ...formData, image: e.target.files[0] });
                     }
+                  }}
+                  className="w-full border rounded-lg px-3 py-2 outline-none"
+                />
+                {editingTrainer && formData.image === null && (
+                  <img
+                    src={`${imgBaseUrl}${editingTrainer.image}`}
+                    alt="Trainer"
+                    className="mt-2 w-20 h-20 rounded-full object-cover"
                   />
+                )}
+              </div>
+               {msgError && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm font-medium animate-shake">
+                  {msgError}
                 </div>
               )}
               {errorMessage && (
