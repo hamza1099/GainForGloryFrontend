@@ -47,8 +47,7 @@ const ForgotPassword = () => {
         if (role === "TRAINER") {
           router.push(`/trainerDetail/${userId}`);
         } else {
-          router.push("/")
-          router.refresh();
+          window.location.href = "/";
         }
         
       } else {
