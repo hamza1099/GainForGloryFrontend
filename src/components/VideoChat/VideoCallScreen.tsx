@@ -182,6 +182,8 @@ const VideoCallScreen = () => {
   // Fetch Agora user info if token and permissions are available
   useEffect(() => {
     if (_token && hasPermissions) {
+      setMsg(AppMessage.waitMsg);
+
       agoraEngineRef.current = AgoraRTC.createClient({
         mode: "rtc",
         codec: "vp8",
@@ -282,7 +284,6 @@ const VideoCallScreen = () => {
           updatedProfile,
         ]);
 
-        setMsg(AppMessage.waitMsg);
         sessionId = response.data.sessionId;
         const channel = response.data.channelName;
         const token = response.data.token;
