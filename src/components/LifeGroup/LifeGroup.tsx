@@ -1,238 +1,685 @@
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import "../../Style/LifeGroupsManagement.css";
+// import {
+//   useGetAllLifeGroupsQuery,
+//   useCreateLifeGroupMutation,
+//   useUpdateLifeGroupMutation,
+//   useDeleteLifeGroupMutation,
+//   useUpdateMemberStatusMutation,
+//   useGetLifeGroupMembersQuery,
+// } from "@/redux/api/lifeGroup"; // path adjust kar lena
+// import { skipToken } from "@reduxjs/toolkit/query";
+
+// type TabType = "groups" | "requests";
+
+// interface LifeGroup {
+//   id: number;
+//   logo: string;
+//   logoColor: "blue" | "emerald" | "orange";
+//   title: string;
+//   description: string;
+// }
+
+// const LifeGroup = () => {
+//   const [activeTab, setActiveTab] = useState<TabType>("groups");
+//   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+//   const { data: groupsData, refetch, isLoading } = useGetAllLifeGroupsQuery({});
+//   const [createLifeGroup, { isLoading: isCreating }] =
+//     useCreateLifeGroupMutation();
+//   const [updateLifeGroup, { isLoading: isUpdating }] =
+//     useUpdateLifeGroupMutation();
+//   const [deleteLifeGroup, { isLoading: isDeleting }] =
+//     useDeleteLifeGroupMutation();
+//   const [updateMemberStatus, { isLoading: isUpdatingStatus }] =
+//     useUpdateMemberStatusMutation();
+//   const {
+//     data: membersData,
+//     isLoading: membersLoading,
+//     isError: membersError,
+//     error: membersErrorData,
+//   } = useGetLifeGroupMembersQuery(
+//     selectedGroupId
+//       ? {
+//           id: selectedGroupId,
+//           page: 1,
+//           limit: 10,
+//         }
+//       : skipToken,
+//   );
+
+//   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+//   const [editGroupData, setEditGroupData] = useState<{
+//     id: number;
+//     title: string;
+//     description: string;
+//     logo?: string;
+//   } | null>(null);
+//   const [editForm, setEditForm] = useState({
+//     title: "",
+//     description: "",
+//   });
+
+//   const [file, setFile] = useState<File | null>(null);
+//   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+//   const lifeGroups = groupsData?.data || [];
+//   const joinRequests =
+//     membersData?.data?.filter((item: any) => item.status === "PENDING") || [];
+
+//   useEffect(() => {
+//     if (editGroupData) {
+//       setEditForm({
+//         title: editGroupData.title,
+//         description: editGroupData.description,
+//       });
+//     }
+//   }, [editGroupData]);
+
+//   const handleEditInputChange = (
+//     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+//   ) => {
+//     const { name, value } = e.target;
+//     setEditForm((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleApproveRequest = async (id: number) => {
+//     try {
+//       await updateMemberStatus({
+//         memberId: id,
+//         status: "ACTIVE",
+//       }).unwrap();
+
+//       refetch(); // refresh groups
+//     } catch (err: any) {
+//       setErrorMsg(err?.data?.message || "Approve failed");
+//     }
+//   };
+
+//   const handleRejectRequest = async (id: number) => {
+//     try {
+//       await updateMemberStatus({
+//         memberId: id,
+//         status: "REJECTED",
+//       }).unwrap();
+//     } catch (err: any) {
+//       setErrorMsg(err?.data?.message || "Reject failed");
+//     }
+//   };
+
+//   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//   try {
+//     const selectedFile = e.target.files?.[0];
+
+//     if (!selectedFile) return;
+
+//     // ✅ validation
+//     if (!selectedFile.type.startsWith("image/")) {
+//       throw new Error("Only image files are allowed");
+//     }
+
+//     if (selectedFile.size > 2 * 1024 * 1024) {
+//       throw new Error("File size must be less than 2MB");
+//     }
+
+//     setFile(selectedFile);
+//     setErrorMsg(null);
+//   } catch (err: any) {
+//     setErrorMsg(err.message);
+//   }
+// };
+//   const handlePrevPage = () => {
+//     console.log("Previous page");
+//     // Implement pagination
+//   };
+
+//   const handleNextPage = () => {
+//     console.log("Next page");
+//     // Implement pagination
+//   };
+
+//   const getLogoClass = (color: string): string => {
+//     switch (color) {
+//       case "blue":
+//         return "m--logo-blue";
+//       case "emerald":
+//         return "m--logo-emerald";
+//       case "orange":
+//         return "m--logo-orange";
+//       default:
+//         return "m--logo-blue";
+//     }
+//   };
+
+//   //Logic
+//   const handleDeleteGroup = async (id: number) => {
+//     try {
+//       const confirmDelete = window.confirm("Are you sure?");
+//       if (!confirmDelete) return;
+
+//       await deleteLifeGroup(id.toString()).unwrap();
+//       refetch();
+//     } catch (err: any) {
+//       setErrorMsg(err?.data?.message || "Delete failed");
+//     }
+//   };
+
+//   const handleAddGroup = async (data: {
+//     title: string;
+//     description: string;
+//   }) => {
+//     try {
+//       setErrorMsg(null);
+
+//       if (!data.title || !data.description) {
+//         throw new Error("All fields are required");
+//       }
+
+//       if (!file) {
+//         throw new Error("Logo is required");
+//       }
+
+//       const formData = new FormData();
+//       formData.append("title", data.title);
+//       formData.append("description", data.description);
+//       formData.append("logo", file);
+
+//       await createLifeGroup(formData).unwrap();
+
+//       refetch();
+//       setFile(null);
+//     } catch (err: any) {
+//       setErrorMsg(err?.data?.message || err.message || "Something went wrong");
+//     }
+//   };
+
+//   const handleUpdateSubmit = async () => {
+//     try {
+//       if (!editGroupData?.id) {
+//         throw new Error("Invalid group");
+//       }
+
+//       if (!editForm.title || !editForm.description) {
+//         throw new Error("All fields required");
+//       }
+
+//       const formData = new FormData();
+//       formData.append("title", editForm.title);
+//       formData.append("description", editForm.description);
+
+//       if (file) {
+//         formData.append("logo", file);
+//       }
+
+//       await updateLifeGroup({
+//         id: editGroupData.id.toString(),
+//         formData,
+//       }).unwrap();
+
+//       setIsEditModalOpen(false);
+//       setEditGroupData(null);
+//       setFile(null);
+//       refetch();
+//     } catch (err: any) {
+//       setErrorMsg(err?.data?.message || err.message);
+//     }
+//   };
+
+//   return (
+//     <div className="m--container">
+//       <main className="m--main">
+//         {/* Header */}
+//         <header className="m--content-header">
+//           <div className="m--header-left">
+//             <h1>Life Groups Management</h1>
+//             <p>Manage community groups and user join requests.</p>
+//           </div>
+//           <button
+//             className="m--btn-primary"
+//             // onClick={handleAddGroup}
+//           >
+//             <svg viewBox="0 0 24 24">
+//               <path
+//                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//               />
+//             </svg>
+//             Add New Life Group
+//           </button>
+//         </header>
+
+//         {/* Tabs Card */}
+//         <section className="m--groups-card">
+//           <div className="m--tabs-header">
+//             <div className="m--tabs-list">
+//               <button
+//                 className={`m--tab-button ${activeTab === "groups" ? "active" : ""}`}
+//                 onClick={() => setActiveTab("groups")}
+//               >
+//                 Life Groups List
+//               </button>
+//               <button
+//                 className={`m--tab-button ${activeTab === "requests" ? "active" : ""}`}
+//                 onClick={() => setActiveTab("requests")}
+
+//               >
+//                 Join Requests
+//               </button>
+//             </div>
+//           </div>
+
+//           <div className="m--tab-panel">
+//             {/* Groups Panel */}
+//             {activeTab === "groups" && (
+//               <div className="m--tab-panel-content">
+//                 <div className="m--table-wrapper">
+//                   <table className="m--table">
+//                     <thead>
+//                       <tr>
+//                         <th>#</th>
+//                         <th>Logo</th>
+//                         <th>Title</th>
+//                         <th>Description</th>
+//                         <th className="text-right">Actions</th>
+//                       </tr>
+//                     </thead>
+//                     <tbody>
+//                       {lifeGroups.map((group: any) => (
+//                         <tr key={group.id}>
+//                           <td>{group.id}</td>
+//                           <td>
+//                             <div
+//                               className={`m--logo-circle ${getLogoClass(group.logoColor)}`}
+//                             >
+//                               {group.logo}
+//                             </div>
+//                           </td>
+//                           <td className="font-semibold">{group.title}</td>
+//                           <td className="m--desc">{group.description}</td>
+//                           <td className="text-right">
+//                             <button
+//                               className="m--btn-edit"
+//                               // onClick={() => handleEditGroup(group.id)}
+//                                onClick={() => setIsEditModalOpen(true)}
+//                             >
+//                               Edit
+//                             </button>
+//                             <button
+//                               className="m--btn-delete"
+//                               onClick={() => handleDeleteGroup(group.id)}
+//                             >
+//                               Delete
+//                             </button>
+//                           </td>
+//                         </tr>
+//                       ))}
+//                     </tbody>
+//                   </table>
+//                 </div>
+//               </div>
+//             )}
+
+//             {/* Requests Panel */}
+//             {activeTab === "requests" && (
+//               <div className="m--tab-panel-content">
+//                 <div className="m--table-wrapper">
+//                   <table className="m--table">
+//                     <thead>
+//                       <tr>
+//                         <th>User Name</th>
+//                         <th>Group Requested</th>
+//                         <th>Status</th>
+//                         <th className="text-right">Actions</th>
+//                       </tr>
+//                     </thead>
+//                     <tbody>
+//                       {joinRequests.map((request: any) => (
+//                         <tr key={request.id}>
+//                           <td>
+//                             <div className="m--user-cell">
+//                               <div className="m--user-avatar">
+//                                 {request.userInitials}
+//                               </div>
+//                               <span>{request.userName}</span>
+//                             </div>
+//                           </td>
+//                           <td>{request.groupRequested}</td>
+//                           <td>
+//                             <span className="m--badge-pending">
+//                               Pending
+//                               <svg viewBox="0 0 24 24">
+//                                 <path
+//                                   d="M19 9l-7 7-7-7"
+//                                   strokeLinecap="round"
+//                                   strokeLinejoin="round"
+//                                 />
+//                               </svg>
+//                             </span>
+//                           </td>
+//                           <td className="text-right">
+//                             <button
+//                               className="m--btn-approve"
+//                               onClick={() => handleApproveRequest(request.id)}
+//                             >
+//                               Approve
+//                             </button>
+//                             <button
+//                               className="m--btn-reject"
+//                               onClick={() => handleRejectRequest(request.id)}
+//                             >
+//                               Reject
+//                             </button>
+//                           </td>
+//                         </tr>
+//                       ))}
+//                     </tbody>
+//                   </table>
+//                 </div>
+//               </div>
+//             )}
+
+//             {/* Pagination */}
+//             <div className="m--pagination">
+//               <button className="m--pagination-prev" onClick={handlePrevPage}>
+//                 <svg viewBox="0 0 24 24">
+//                   <path
+//                     d="M15 19l-7-7 7-7"
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                   />
+//                 </svg>
+//               </button>
+//               <span className="m--page-indicator">1</span>
+//               <button className="m--pagination-next" onClick={handleNextPage}>
+//                 <svg viewBox="0 0 24 24">
+//                   <path
+//                     d="M9 5l7 7-7 7"
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                   />
+//                 </svg>
+//               </button>
+//             </div>
+//           </div>
+//         </section>
+//       </main>
+
+//       {isEditModalOpen && (
+//         <div className="m--modal-overlay">
+//           <div className="m--modal-container">
+//             <div className="m--modal-header">
+//               <h2>Edit Life Group</h2>
+//               <button onClick={() => setIsEditModalOpen(false)}>✕</button>
+//             </div>
+
+//             <div className="m--modal-body">
+//               {/* Error */}
+//               {errorMsg && <p className="m--error-text">{errorMsg}</p>}
+
+//               {/* Title */}
+//               <div className="m--form-group">
+//                 <label>Title</label>
+//                 <input
+//                   type="text"
+//                   name="title"
+//                   value={editForm.title}
+//                   onChange={handleEditInputChange}
+//                   className="m--form-input"
+//                 />
+//               </div>
+
+//               {/* Description */}
+//               <div className="m--form-group">
+//                 <label>Description</label>
+//                 <textarea
+//                   name="description"
+//                   value={editForm.description}
+//                   onChange={handleEditInputChange}
+//                   className="m--form-textarea"
+//                 />
+//               </div>
+
+//               {/* File Upload */}
+//               <div className="m--form-group">
+//                 <label>Logo</label>
+//                 <input type="file" onChange={handleFileChange} />
+//               </div>
+//             </div>
+
+//             <div className="m--modal-footer">
+//               <button onClick={() => setIsEditModalOpen(false)}>Cancel</button>
+
+//               <button
+//                 className="m--btn-primary"
+//                 onClick={handleUpdateSubmit}
+//                 disabled={isUpdating}
+//               >
+//                 {isUpdating ? "Updating..." : "Update"}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default LifeGroup;
+
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../../Style/LifeGroupsManagement.css";
+import {
+  useGetAllLifeGroupsQuery,
+  useCreateLifeGroupMutation,
+  useUpdateLifeGroupMutation,
+  useDeleteLifeGroupMutation,
+  useUpdateMemberStatusMutation,
+  useGetLifeGroupMembersQuery,
+} from "@/redux/api/lifeGroup";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { RequestDetailsModal } from "./RequestDetailsModal";
 
 type TabType = "groups" | "requests";
 
-interface LifeGroup {
-  id: number;
-  logo: string;
-  logoColor: "blue" | "emerald" | "orange";
+interface LifeGroupItem {
+  id: string; // API string IDs use kar rhi hai (MongoDB style)
   title: string;
   description: string;
-}
-
-interface JoinRequest {
-  id: number;
-  userName: string;
-  userInitials: string;
-  groupRequested: string;
-  status: "pending" | "approved" | "rejected";
-}
-
-interface ApplicationFormData {
-  fullName: string;
-  emailPhone: string;
-  targetGroup: string;
-  reasonForJoining: string;
-  spiritualGoals: string;
-  struggles: string;
-  confidential: "yes" | "no" | null;
-  commitment: "yes" | "no" | null;
-  preferredTime: "Morning" | "Afternoon" | "Evening" | null;
-  preferredDays: string[];
-  notes: string;
+  logo: string;
 }
 
 const LifeGroup = () => {
   const [activeTab, setActiveTab] = useState<TabType>("groups");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedApplicant, setSelectedApplicant] = useState<{
-    name: string;
-    email: string;
-  } | null>(null);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10; // Items per page
+  // ✅ ID string hai based on your API response
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const {
+    data: groupsData,
+    refetch: refetchGroups,
+    isLoading: groupsLoading,
+  } = useGetAllLifeGroupsQuery({});
 
-  // Sample data
-  const lifeGroups: LifeGroup[] = [
-    {
-      id: 1,
-      logo: "Y",
-      logoColor: "blue",
-      title: "Youth Fellowship",
-      description:
-        "Community for ages 18-25 focusing on spiritual growth and leadership.",
-    },
-    {
-      id: 2,
-      logo: "M",
-      logoColor: "emerald",
-      title: "Morning Prayer",
-      description:
-        "Daily morning sessions for collective meditation and prayer.",
-    },
-    {
-      id: 3,
-      logo: "F",
-      logoColor: "orange",
-      title: "Family Circle",
-      description:
-        "Resources and support for growing families in the community.",
-    },
-  ];
+  const [createLifeGroup, { isLoading: isCreating }] =
+    useCreateLifeGroupMutation();
+  const [updateLifeGroup, { isLoading: isUpdating }] =
+    useUpdateLifeGroupMutation();
+  const [deleteLifeGroup, { isLoading: isDeleting }] =
+    useDeleteLifeGroupMutation();
+  const [updateMemberStatus] = useUpdateMemberStatusMutation();
 
-  const joinRequests: JoinRequest[] = [
-    {
-      id: 1,
-      userName: "John Doe",
-      userInitials: "JD",
-      groupRequested: "Youth Fellowship",
-      status: "pending",
-    },
-    {
-      id: 2,
-      userName: "Sarah Adams",
-      userInitials: "SA",
-      groupRequested: "Family Circle",
-      status: "pending",
-    },
-  ];
+  // ✅ Automatically fetches members when selectedGroupId changes
 
-  // Modal form state
-  const [formData, setFormData] = useState<ApplicationFormData>({
-    fullName: "Sarah Jenkins",
-    emailPhone: "sarah.j@example.com",
-    targetGroup: "Young Professionals - Downtown",
-    reasonForJoining: "",
-    spiritualGoals: "",
-    struggles: "",
-    confidential: null,
-    commitment: null,
-    preferredTime: "Afternoon",
-    preferredDays: ["TUE", "WED"],
-    notes: "",
-  });
+  const {
+    data: membersData,
+    isLoading: membersLoading,
+    refetch: refetchMembers,
+  } = useGetLifeGroupMembersQuery(
+    selectedGroupId
+      ? { id: selectedGroupId, page: currentPage, limit }
+      : skipToken,
+  );
 
-  const [selectedDays, setSelectedDays] = useState<string[]>(["TUE", "WED"]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Separate add modal for cleanliness
 
-  const groupOptions = [
-    "Young Professionals - Downtown",
-    "Marriage Matters - Evening Group",
-    "Men's Morning Study",
-    "Women in Leadership",
-  ];
+  const [editGroupData, setEditGroupData] = useState<LifeGroupItem | null>(
+    null,
+  );
+  const [formState, setFormState] = useState({ title: "", description: "" });
 
-  const timeOptions: Array<"Morning" | "Afternoon" | "Evening"> = [
-    "Morning",
-    "Afternoon",
-    "Evening",
-  ];
+  const [file, setFile] = useState<File | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const dayOptions = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+  const lifeGroups = groupsData?.data || [];
 
-  const handleAddGroup = () => {
-    console.log("Add new life group");
-    // Implement add group functionality
-  };
+  // ✅ Safely checking nesting of your member list response
+  const joinRequests = membersData?.data?.data || [];
+  const totalPages = membersData?.data?.meta?.totalPage || 1;
 
-  const handleEditGroup = (id: number) => {
-    console.log("Edit group", id);
-    // Implement edit functionality
-  };
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedGroupId]);
+  // Edit form handling
 
-  const handleDeleteGroup = (id: number) => {
-    console.log("Delete group", id);
-    // Implement delete functionality
-  };
-
-  const handleApproveRequest = (id: number) => {
-    console.log("Approve request", id);
-    // Find the request and open modal with applicant data
-    const request = joinRequests.find((r) => r.id === id);
-    if (request) {
-      setSelectedApplicant({
-        name: request.userName,
-        email: `${request.userName.toLowerCase().replace(" ", ".")}@example.com`,
+  useEffect(() => {
+    if (editGroupData) {
+      setFormState({
+        title: editGroupData.title,
+        description: editGroupData.description,
       });
-      setFormData((prev) => ({
-        ...prev,
-        fullName: request.userName,
-        emailPhone: `${request.userName.toLowerCase().replace(" ", ".")}@example.com`,
-        targetGroup: request.groupRequested,
-      }));
-      setIsModalOpen(true);
+    } else {
+      setFormState({ title: "", description: "" });
     }
+  }, [editGroupData]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRejectRequest = (id: number) => {
-    console.log("Reject request", id);
-    // Implement reject functionality
-  };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
 
-  const handlePrevPage = () => {
-    console.log("Previous page");
-    // Implement pagination
+    if (!selectedFile.type.startsWith("image/")) {
+      setErrorMsg("Only image files are allowed");
+      return;
+    }
+    if (selectedFile.size > 2 * 1024 * 1024) {
+      setErrorMsg("File size must be less than 2MB");
+      return;
+    }
+
+    setFile(selectedFile);
+    setErrorMsg(null);
   };
 
   const handleNextPage = () => {
-    console.log("Next page");
-    // Implement pagination
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setSelectedApplicant(null);
-    // Reset form to default values
-    setFormData({
-      fullName: "Sarah Jenkins",
-      emailPhone: "sarah.j@example.com",
-      targetGroup: "Young Professionals - Downtown",
-      reasonForJoining: "",
-      spiritualGoals: "",
-      struggles: "",
-      confidential: null,
-      commitment: null,
-      preferredTime: "Afternoon",
-      preferredDays: ["TUE", "WED"],
-      notes: "",
-    });
-    setSelectedDays(["TUE", "WED"]);
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
   };
 
-  const handleModalSubmit = () => {
-    console.log("Submit application", formData);
-    // Implement submit functionality
-    alert("Application submitted successfully!");
-    handleModalClose();
+  // ✅ Member list trigger
+  const handleSelectGroupForMembers = (groupId: string) => {
+    setSelectedGroupId(groupId);
+    setActiveTab("requests"); // Tab shift kar do user ko
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleApproveRequest = async (memberId: string) => {
+    try {
+      await updateMemberStatus({ memberId, status: "ACTIVE" }).unwrap();
+      refetchMembers();
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || "Approve failed");
+    }
   };
 
-  const handleRadioChange = (name: string, value: "yes" | "no") => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleRejectRequest = async (memberId: string) => {
+    try {
+      await updateMemberStatus({ memberId, status: "REJECTED" }).unwrap();
+      refetchMembers();
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || "Reject failed");
+    }
   };
 
-  const handleTimeSelect = (time: "Morning" | "Afternoon" | "Evening") => {
-    setFormData((prev) => ({ ...prev, preferredTime: time }));
+  const handleDeleteGroup = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this group?")) return;
+    try {
+      await deleteLifeGroup(id).unwrap();
+      refetchGroups();
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || "Delete failed");
+    }
   };
 
-  const handleDayToggle = (day: string) => {
-    setSelectedDays((prev) => {
-      const newDays = prev.includes(day)
-        ? prev.filter((d) => d !== day)
-        : [...prev, day];
-      setFormData((prevData) => ({ ...prevData, preferredDays: newDays }));
-      return newDays;
-    });
+  const handleAddSubmit = async () => {
+    try {
+      setErrorMsg(null);
+      if (!formState.title || !formState.description || !file) {
+        throw new Error("All fields and logo are required");
+      }
+
+      const formData = new FormData();
+      formData.append("title", formState.title);
+      formData.append("description", formState.description);
+      formData.append("logo", file);
+
+      await createLifeGroup(formData).unwrap();
+
+      setIsAddModalOpen(false);
+      setFormState({ title: "", description: "" });
+      setFile(null);
+      refetchGroups();
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || err.message || "Failed to create");
+    }
   };
 
-  const getLogoClass = (color: string): string => {
-    switch (color) {
-      case "blue":
-        return "m--logo-blue";
-      case "emerald":
-        return "m--logo-emerald";
-      case "orange":
-        return "m--logo-orange";
-      default:
-        return "m--logo-blue";
+  const handleEditClick = (group: LifeGroupItem) => {
+    setEditGroupData(group);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateSubmit = async () => {
+    try {
+      if (!editGroupData?.id) throw new Error("Invalid group");
+      if (!formState.title || !formState.description)
+        throw new Error("Fields required");
+
+      const formData = new FormData();
+      formData.append("title", formState.title);
+      formData.append("description", formState.description);
+      if (file) formData.append("logo", file);
+
+      await updateLifeGroup({
+        id: editGroupData.id,
+        formData,
+      }).unwrap();
+
+      setIsEditModalOpen(false);
+      setEditGroupData(null);
+      setFile(null);
+      refetchGroups();
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || err.message);
     }
   };
 
@@ -245,7 +692,14 @@ const LifeGroup = () => {
             <h1>Life Groups Management</h1>
             <p>Manage community groups and user join requests.</p>
           </div>
-          <button className="m--btn-primary" onClick={handleAddGroup}>
+          <button
+            className="m--btn-primary"
+            onClick={() => {
+              setIsAddModalOpen(true);
+              setFormState({ title: "", description: "" });
+              setFile(null);
+            }}
+          >
             <svg viewBox="0 0 24 24">
               <path
                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
@@ -271,7 +725,12 @@ const LifeGroup = () => {
                 className={`m--tab-button ${activeTab === "requests" ? "active" : ""}`}
                 onClick={() => setActiveTab("requests")}
               >
-                Join Requests
+                Join Requests{" "}
+                {selectedGroupId && (
+                  <span style={{ fontSize: "12px", color: "#666" }}>
+                    (Selected Group)
+                  </span>
+                )}
               </button>
             </div>
           </div>
@@ -284,7 +743,6 @@ const LifeGroup = () => {
                   <table className="m--table">
                     <thead>
                       <tr>
-                        <th>#</th>
                         <th>Logo</th>
                         <th>Title</th>
                         <th>Description</th>
@@ -292,34 +750,66 @@ const LifeGroup = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {lifeGroups.map((group) => (
-                        <tr key={group.id}>
-                          <td>{group.id}</td>
-                          <td>
-                            <div
-                              className={`m--logo-circle ${getLogoClass(group.logoColor)}`}
-                            >
-                              {group.logo}
-                            </div>
-                          </td>
-                          <td className="font-semibold">{group.title}</td>
-                          <td className="m--desc">{group.description}</td>
-                          <td className="text-right">
-                            <button
-                              className="m--btn-edit"
-                              onClick={() => handleEditGroup(group.id)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="m--btn-delete"
-                              onClick={() => handleDeleteGroup(group.id)}
-                            >
-                              Delete
-                            </button>
-                          </td>
+                      {groupsLoading ? (
+                        <tr>
+                          <td colSpan={4}>Loading groups...</td>
                         </tr>
-                      ))}
+                      ) : (
+                        lifeGroups.map((group: any) => (
+                          <tr key={group.id}>
+                            <td>
+                              {/* Display Actual image if available */}
+                              {group.logo ? (
+                                <img
+                                  src={group.logo}
+                                  alt={group.title}
+                                  className="m--logo-circle"
+                                  style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    objectFit: "cover",
+                                    borderRadius: "50%",
+                                  }}
+                                />
+                              ) : (
+                                <div className="m--logo-circle m--logo-blue">
+                                  {group.title.charAt(0)}
+                                </div>
+                              )}
+                            </td>
+                            <td className="font-semibold">{group.title}</td>
+                            <td className="m--desc">{group.description}</td>
+                            <td className="text-right">
+                              {/* ✅ Select group and go to requests tab */}
+                              <button
+                                className="m--btn-edit"
+                                style={{
+                                  background: "#4f46e5",
+                                  color: "#fff",
+                                  marginRight: "5px",
+                                }}
+                                onClick={() =>
+                                  handleSelectGroupForMembers(group.id)
+                                }
+                              >
+                                View Requests
+                              </button>
+                              <button
+                                className="m--btn-edit"
+                                onClick={() => handleEditClick(group)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="m--btn-delete"
+                                onClick={() => handleDeleteGroup(group.id)}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -329,338 +819,292 @@ const LifeGroup = () => {
             {/* Requests Panel */}
             {activeTab === "requests" && (
               <div className="m--tab-panel-content">
-                <div className="m--table-wrapper">
-                  <table className="m--table">
-                    <thead>
-                      <tr>
-                        <th>User Name</th>
-                        <th>Group Requested</th>
-                        <th>Status</th>
-                        <th className="text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {joinRequests.map((request) => (
-                        <tr key={request.id}>
-                          <td>
-                            <div className="m--user-cell">
-                              <div className="m--user-avatar">
-                                {request.userInitials}
-                              </div>
-                              <span>{request.userName}</span>
-                            </div>
-                          </td>
-                          <td>{request.groupRequested}</td>
-                          <td>
-                            <span className="m--badge-pending">
-                              Pending
-                              <svg viewBox="0 0 24 24">
-                                <path
-                                  d="M19 9l-7 7-7-7"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </span>
-                          </td>
-                          <td className="text-right">
-                            <button
-                              className="m--btn-approve"
-                              onClick={() => handleApproveRequest(request.id)}
-                            >
-                              Approve
-                            </button>
-                            <button
-                              className="m--btn-reject"
-                              onClick={() => handleRejectRequest(request.id)}
-                            >
-                              Reject
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                {!selectedGroupId ? (
+                  <p
+                    style={{
+                      padding: "20px",
+                      textAlign: "center",
+                      color: "#666",
+                    }}
+                  >
+                    Please select a Life Group from the list to view its pending
+                    requests.
+                  </p>
+                ) : (
+                  <>
+                    <div className="m--table-wrapper">
+                      <table className="m--table">
+                        <thead>
+                          <tr>
+                            <th>User Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th className="text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {membersLoading ? (
+                            <tr>
+                              <td colSpan={4}>Loading requests...</td>
+                            </tr>
+                          ) : joinRequests.length === 0 ? (
+                            <tr>
+                              <td colSpan={4}>
+                                No requests found for this group.
+                              </td>
+                            </tr>
+                          ) : (
+                            joinRequests.map((request: any) => (
+                              <tr key={request.id}>
+                                <td>
+                                  <div className="m--user-cell">
+                                    <div className="m--user-avatar">
+                                      {request.user?.name
+                                        ? request.user.name.charAt(0)
+                                        : "U"}
+                                    </div>
+                                    <span>
+                                      {request.user?.name || "Unknown"}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td>{request.user?.email || "N/A"}</td>
+                                <td>{request.user?.role || "N/A"}</td>
+
+                                <td>{request.user?.location || "N/A"}</td>
+                                <td>
+                                  <span
+                                    className={`m--badge-${request.status.toLowerCase()}`}
+                                  >
+                                    {request.status}
+                                  </span>
+                                </td>
+                                <td className="text-right">
+                                  <button
+                                    className="m--btn-view"
+                                    onClick={() => {
+                                      setSelectedRequest(request);
+                                      setIsDetailsModalOpen(true);
+                                    }}
+                                    style={{
+                                      background: "#64748b",
+                                      color: "#fff",
+                                      padding: "4px 8px",
+                                      borderRadius: "4px",
+                                    }}
+                                  >
+                                    View Details
+                                  </button>
+                                  {request.status === "PENDING" ? (
+                                    <div className="m--btn-group">
+                                      <button
+                                        className="m--btn-approve"
+                                        onClick={() =>
+                                          handleApproveRequest(request.id)
+                                        }
+                                      >
+                                        Approve
+                                      </button>
+                                      <button
+                                        className="m--btn-reject"
+                                        onClick={() =>
+                                          handleRejectRequest(request.id)
+                                        }
+                                      >
+                                        Reject
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <span className="m--processed-text">
+                                      {request.status === "ACTIVE"
+                                        ? "Accepted ✅"
+                                        : "Declined ❌"}
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                    {joinRequests.length > 0 && (
+                      <div className="m--pagination">
+                        <button
+                          className="m--pagination-prev"
+                          onClick={handlePrevPage}
+                          disabled={currentPage === 1}
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            width="20"
+                            height="20"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              d="M15 19l-7-7 7-7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+
+                        <span className="m--page-indicator">
+                          Page <strong>{currentPage}</strong> of {totalPages}
+                        </span>
+
+                        <button
+                          className="m--pagination-next"
+                          onClick={handleNextPage}
+                          disabled={currentPage >= totalPages}
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            width="20"
+                            height="20"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              d="M9 5l7 7-7 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
-
-            {/* Pagination */}
-            <div className="m--pagination">
-              <button className="m--pagination-prev" onClick={handlePrevPage}>
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M15 19l-7-7 7-7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-              <span className="m--page-indicator">1</span>
-              <button className="m--pagination-next" onClick={handleNextPage}>
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M9 5l7 7-7 7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
           </div>
         </section>
       </main>
 
-      {/* Application Modal - Light Mode Only */}
-      {isModalOpen && (
+      {/* --- ✅ ADD LIFE GROUP MODAL --- */}
+      {isAddModalOpen && (
         <div className="m--modal-overlay">
           <div className="m--modal-container">
-            {/* Modal Header */}
             <div className="m--modal-header">
-              <div>
-                <h2 className="m--modal-title">Life Group Application</h2>
-                <p className="m--modal-subtitle">
-                  Please review the application details below.
-                </p>
-              </div>
-              <button className="m--modal-close" onClick={handleModalClose}>
-                <svg viewBox="0 0 24 24" width="24" height="24">
-                  <path
-                    d="M6 18L18 6M6 6l12 12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
+              <h2>Add Life Group</h2>
+              <button onClick={() => setIsAddModalOpen(false)}>✕</button>
             </div>
-
-            {/* Modal Body */}
             <div className="m--modal-body">
-              {/* 1. Full Name & 2. Email/Phone */}
-              <section className="m--form-row">
-                <div className="m--form-group">
-                  <label className="m--form-label">1. Full Name</label>
-                  <input
-                    className="m--form-input"
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    readOnly
-                  />
-                </div>
-                <div className="m--form-group">
-                  <label className="m--form-label">2. Email / Phone</label>
-                  <input
-                    className="m--form-input"
-                    type="text"
-                    name="emailPhone"
-                    value={formData.emailPhone}
-                    onChange={handleInputChange}
-                    readOnly
-                  />
-                </div>
-              </section>
-
-              {/* 3. Target Life Group */}
-              <section className="m--form-section">
-                <label className="m--form-label">
-                  3. Which Life Group are you applying to?
-                </label>
-                <select
-                  className="m--form-select"
-                  name="targetGroup"
-                  value={formData.targetGroup}
-                  onChange={handleInputChange}
-                >
-                  {groupOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </section>
-
-              {/* 4, 5, 6. Narrative Questions */}
-              <section className="m--form-section">
-                <div className="m--form-group">
-                  <label className="m--form-label">
-                    4. Why do you want to join this group?
-                  </label>
-                  <textarea
-                    className="m--form-textarea"
-                    name="reasonForJoining"
-                    value={formData.reasonForJoining}
-                    onChange={handleInputChange}
-                    placeholder="Share your reasons for interest..."
-                  />
-                </div>
-
-                <div className="m--form-group">
-                  <label className="m--form-label">
-                    5. What are you hoping God grows in you during this season?
-                  </label>
-                  <textarea
-                    className="m--form-textarea"
-                    name="spiritualGoals"
-                    value={formData.spiritualGoals}
-                    onChange={handleInputChange}
-                    placeholder="Spiritual growth goals..."
-                  />
-                </div>
-
-                <div className="m--form-group">
-                  <label className="m--form-label">
-                    6. What's your biggest struggle right now related to this
-                    group topic?
-                  </label>
-                  <textarea
-                    className="m--form-textarea"
-                    name="struggles"
-                    value={formData.struggles}
-                    onChange={handleInputChange}
-                    placeholder="Be as open as you're comfortable with..."
-                  />
-                </div>
-              </section>
-
-              {/* 7 & 10. Yes/No Questions */}
-              <section className="m--form-highlight">
-                <div className="m--form-row">
-                  <span className="m--form-label">
-                    7. Are you willing to keep this group confidential and
-                    respectful?
-                  </span>
-                  <div className="m--radio-group">
-                    <label className="m--radio-label">
-                      <input
-                        type="radio"
-                        name="confidential"
-                        className="m--radio-input"
-                        checked={formData.confidential === "yes"}
-                        onChange={() =>
-                          handleRadioChange("confidential", "yes")
-                        }
-                      />
-                      <span>Yes</span>
-                    </label>
-                    <label className="m--radio-label">
-                      <input
-                        type="radio"
-                        name="confidential"
-                        className="m--radio-input"
-                        checked={formData.confidential === "no"}
-                        onChange={() => handleRadioChange("confidential", "no")}
-                      />
-                      <span>No</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="m--form-row">
-                  <span className="m--form-label">
-                    10. Commitment: Can you attend at least 3 out of 4 weeks
-                    each month?
-                  </span>
-                  <div className="m--radio-group">
-                    <label className="m--radio-label">
-                      <input
-                        type="radio"
-                        name="commitment"
-                        className="m--radio-input"
-                        checked={formData.commitment === "yes"}
-                        onChange={() => handleRadioChange("commitment", "yes")}
-                      />
-                      <span>Yes</span>
-                    </label>
-                    <label className="m--radio-label">
-                      <input
-                        type="radio"
-                        name="commitment"
-                        className="m--radio-input"
-                        checked={formData.commitment === "no"}
-                        onChange={() => handleRadioChange("commitment", "no")}
-                      />
-                      <span>No</span>
-                    </label>
-                  </div>
-                </div>
-              </section>
-
-              {/* 8 & 9. Time & Day Preferences */}
-              <section className="m--form-row">
-                <div className="m--form-group">
-                  <label className="m--form-label">
-                    8. Preferred meeting time (pick one)
-                  </label>
-                  <div className="m--time-buttons">
-                    {timeOptions.map((time) => (
-                      <button
-                        key={time}
-                        type="button"
-                        className={`m--time-button ${
-                          formData.preferredTime === time ? "active" : ""
-                        }`}
-                        onClick={() => handleTimeSelect(time)}
-                      >
-                        {time}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="m--form-group">
-                  <label className="m--form-label">
-                    9. Preferred meeting day (multi-select)
-                  </label>
-                  <div className="m--day-buttons">
-                    {dayOptions.map((day) => (
-                      <label
-                        key={day}
-                        className={`m--day-label ${
-                          selectedDays.includes(day) ? "selected" : ""
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          className="m--day-checkbox"
-                          checked={selectedDays.includes(day)}
-                          onChange={() => handleDayToggle(day)}
-                        />
-                        <span>{day}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </section>
-
-              {/* 11. Optional Notes */}
+              {errorMsg && <p className="m--error-text">{errorMsg}</p>}
               <div className="m--form-group">
-                <label className="m--form-label">
-                  11. Any notes you want the leader to know? (Optional)
-                </label>
-                <textarea
-                  className="m--form-textarea"
-                  name="notes"
-                  value={formData.notes}
+                <label>Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formState.title}
                   onChange={handleInputChange}
-                  placeholder="Add any extra details..."
+                  className="m--form-input"
                 />
               </div>
+              <div className="m--form-group">
+                <label>Description</label>
+                <textarea
+                  name="description"
+                  value={formState.description}
+                  onChange={handleInputChange}
+                  className="m--form-textarea"
+                />
+              </div>
+              <div className="m--form-group">
+                <label>Logo File</label>
+                <input type="file" onChange={handleFileChange} />
+              </div>
             </div>
-
-            {/* Modal Footer */}
             <div className="m--modal-footer">
-              <button className="m--btn-secondary" onClick={handleModalClose}>
-                Cancel
-              </button>
-              <button className="m--btn-primary" onClick={handleModalSubmit}>
-                Submit Application
+              <button onClick={() => setIsAddModalOpen(false)}>Cancel</button>
+              <button
+                className="m--btn-primary"
+                onClick={handleAddSubmit}
+                disabled={isCreating}
+              >
+                {isCreating ? "Creating..." : "Create"}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* --- ✅ EDIT LIFE GROUP MODAL --- */}
+      {isEditModalOpen && (
+        <div className="m--modal-overlay">
+          <div className="m--modal-container">
+            <div className="m--modal-header">
+              <h2>Edit Life Group</h2>
+              <button
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditGroupData(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="m--modal-body">
+              {errorMsg && <p className="m--error-text">{errorMsg}</p>}
+              <div className="m--form-group">
+                <label>Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formState.title}
+                  onChange={handleInputChange}
+                  className="m--form-input"
+                />
+              </div>
+              <div className="m--form-group">
+                <label>Description</label>
+                <textarea
+                  name="description"
+                  value={formState.description}
+                  onChange={handleInputChange}
+                  className="m--form-textarea"
+                />
+              </div>
+              <div className="m--form-group">
+                <label>Logo (Optional update)</label>
+                <input type="file" onChange={handleFileChange} />
+              </div>
+            </div>
+            <div className="m--modal-footer">
+              <button
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditGroupData(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="m--btn-primary"
+                onClick={handleUpdateSubmit}
+                disabled={isUpdating}
+              >
+                {isUpdating ? "Updating..." : "Update"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDetailsModalOpen && (
+        <RequestDetailsModal 
+          request={selectedRequest} 
+          onClose={() => {
+            setIsDetailsModalOpen(false);
+            setSelectedRequest(null);
+          }} 
+        />
       )}
     </div>
   );

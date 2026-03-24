@@ -5,8 +5,8 @@ import Cookies from "js-cookie";
 // Utility function to handle the base API URL
 const baseApiHandler = () => {
   // const apiUrl = "http://82.180.161.133:6032/api/v1";
-  const apiUrl = "https://api.nazir.info/api/v1";
-  // const apiUrl = "http://localhost:6032/api/v1";
+  // const apiUrl = "https://api.nazir.info/api/v1";
+  const apiUrl = "http://localhost:6032/api/v1";
 
   return apiUrl;
 };
@@ -40,5 +40,7 @@ export const baseApi = createApi({
     "product",
     "order",
     "trainer",
+    "lifegroup",
+    "banner"
   ],
 });
