@@ -1,5 +1,4 @@
-  
-  export const navigation = [
+export const navigation = [
   {
     label: "Dashboard",
     route: "/",
@@ -448,8 +447,54 @@
       </svg>
     ),
   },
+  {
+    label: "Life Groups",
+    route: "/life-group",
+    iconPath: (
+      <svg
+        // className="w-6 h-6 text-gray-800 dark:text-white"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+        />
+      </svg>
+    ),
+    whiteIcon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+      >
+        <path
+          d="M2.08325 10.0002C2.08325 6.26821 2.08325 4.40224 3.24262 3.24287C4.40199 2.0835 6.26797 2.0835 9.99992 2.0835C13.7318 2.0835 15.5978 2.0835 16.7573 3.24287C17.9166 4.40224 17.9166 6.26821 17.9166 10.0002C17.9166 13.7321 17.9166 15.5981 16.7573 16.7575C15.5978 17.9169 13.7318 17.9169 9.99992 17.9169C6.26797 17.9169 4.40199 17.9169 3.24262 16.7575C2.08325 15.5981 2.08325 13.7321 2.08325 10.0002Z"
+          stroke="white"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M10.0001 6.66675V13.3335M13.3334 10.0001H6.66675"
+          stroke="white"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
 ];
-
 
 export const trainerNavigation = [
   {
@@ -531,4 +576,4 @@ export const trainerNavigation = [
       </svg>
     ),
   },
-]
+];
