@@ -38,7 +38,7 @@ const NavbarSlider = ({
   const isAdmin = data?.data?.role === "ADMIN";
   // Sidebar content
   const sidebarContent = (
-    <aside className="w-[240px] mt-0 md:mt-32 h-full bg-white flex flex-col justify-between font-inter z-[999]">
+    <aside className="w-[240px] mt-0 md:mt-[55px] h-full bg-white flex flex-col justify-between font-inter z-[999]">
       <div className="pt-6">
         <ul className="ml-6">
           {isAdmin &&

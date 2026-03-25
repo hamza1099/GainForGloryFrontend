@@ -15,8 +15,16 @@
   width: 100%;
   min-height: 100vh;
   background-color: #f8fafc;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   color: #1e293b;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -60,7 +68,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border: none;
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;
@@ -85,7 +95,9 @@
   background-color: #ffffff;
   border-radius: 0.75rem;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
   overflow: hidden;
 }
 
@@ -109,7 +121,9 @@
   border-bottom: 2px solid transparent;
   color: #64748b;
   cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
 }
 
 .m--tab-button:hover {
@@ -302,7 +316,9 @@
 }
 
 .m--btn-approve:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .m--btn-reject {
@@ -387,7 +403,7 @@
 .m--modal-container {
   background-color: #ffffff;
   width: 100%;
-  max-width: 42rem;
+  max-width: 500px;
   max-height: 90vh;
   border-radius: 1rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -405,7 +421,10 @@
   align-items: center;
   background-color: #ffffff;
 }
-
+.m--modal-header {
+  font-weight: 700;
+  font-size: 20px;
+}
 .m--modal-title {
   font-size: 1.5rem;
   font-weight: 900;
@@ -442,7 +461,7 @@
   background-color: #f8fafc;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 22px;
 }
 
 .m--modal-footer {
@@ -489,7 +508,7 @@
 .m--form-input {
   width: 100%;
   background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #ccc;
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
@@ -526,7 +545,7 @@
 .m--form-textarea {
   width: 100%;
   background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #ccc;
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
@@ -650,4 +669,106 @@
 
 .m--btn-secondary:hover {
   background-color: #f1f5f9;
+}
+.errorbox {
+  text-align: center;
+  color: red;
+  font-weight: 700;
+  font-size: 18px;
+}
+.tdflex {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+.view-detail-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.m--btn-reject {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: red;
+  background-color: #ffe4e4;
+  border: 1px solid red;
+}
+.m--btn-reject span{
+  font-size: 14px;
+  color: red;
+}
+.m--table {
+}
+.m--pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.m--page-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.m--page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.m--page-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+}
+
+.m--page-number.active {
+  background: #5a67a5; /* image jaisa bluish */
+  color: #fff;
+}
+label{
+  font-size: 15px;
+  font-weight: 600;
+}
+.m--drag-drop {
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border 0.3s, background-color 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.m--drag-drop.drag-over {
+  border-color: #4f46e5;
+  background-color: #f0f0ff;
+}
+
+.drag-drop-text {
+  color: #666;
+  font-size: 14px;
+  pointer-events: none;
+}
+.m--drag-drop label{
+}
+.m--drag-drop span{
+  color: #ccc;
+  font-size: 44px;
 }

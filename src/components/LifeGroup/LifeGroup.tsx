@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "../../Style/LifeGroupsManagement.css";
 import {
   useGetAllLifeGroupsQuery,
@@ -61,6 +61,8 @@ const LifeGroup = () => {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Separate add modal for cleanliness
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [editGroupData, setEditGroupData] = useState<LifeGroupItem | null>(
     null,
@@ -284,7 +286,9 @@ const LifeGroup = () => {
                     <tbody>
                       {groupsLoading ? (
                         <tr>
-                          <td colSpan={4}>Loading groups...</td>
+                          <td colSpan={6} className="errorbox">
+                            Loading groups...
+                          </td>
                         </tr>
                       ) : (
                         lifeGroups.map((group: any) => (
@@ -379,11 +383,13 @@ const LifeGroup = () => {
                         <tbody>
                           {membersLoading ? (
                             <tr>
-                              <td colSpan={4}>Loading requests...</td>
+                              <td colSpan={6} className="errorbox">
+                                Loading requests...
+                              </td>
                             </tr>
                           ) : joinRequests.length === 0 ? (
                             <tr>
-                              <td colSpan={4}>
+                              <td colSpan={6} className="errorbox">
                                 No requests found for this group.
                               </td>
                             </tr>
@@ -413,30 +419,45 @@ const LifeGroup = () => {
                                     {request.status}
                                   </span>
                                 </td>
-                                <td className="text-right">
+                                <td className="tdflex">
                                   <button
-                                    className="m--btn-view"
+                                    className="view-detail-btn"
                                     onClick={() => {
                                       setSelectedRequest(request);
                                       setIsDetailsModalOpen(true);
                                     }}
-                                    style={{
-                                      background: "#64748b",
-                                      color: "#fff",
-                                      padding: "4px 8px",
-                                      borderRadius: "4px",
-                                    }}
                                   >
-                                    View Details
+                                    <span className="material-symbols-outlined">
+                                      visibility
+                                    </span>
+                                    View <br /> Details
                                   </button>
                                   {request.status === "PENDING" ? (
-                                    <div className="m--btn-group">
+                                    <div
+                                      className="m--btn-group"
+                                      style={{
+                                        display: "flex",
+                                        gap: "4PX",
+                                        alignItems: "center",
+                                      }}
+                                    >
                                       <button
                                         className="m--btn-approve"
+                                        style={{
+                                          display: "flex",
+                                          gap: "5px",
+                                          alignItems: "center",
+                                        }}
                                         onClick={() =>
                                           handleApproveRequest(request.id)
                                         }
                                       >
+                                        <span
+                                          className="material-symbols-outlined"
+                                          style={{ fontSize: "15px" }}
+                                        >
+                                          check_circle
+                                        </span>
                                         Approve
                                       </button>
                                       <button
@@ -445,6 +466,9 @@ const LifeGroup = () => {
                                           handleRejectRequest(request.id)
                                         }
                                       >
+                                        <span className="material-symbols-outlined">
+                                          close_small
+                                        </span>
                                         Reject
                                       </button>
                                     </div>
@@ -463,51 +487,84 @@ const LifeGroup = () => {
                       </table>
                     </div>
                     {joinRequests.length > 0 && (
+                      // <div className="m--pagination">
+                      //   <button
+                      //     className="m--pagination-prev"
+                      //     onClick={handlePrevPage}
+                      //     disabled={currentPage === 1}
+                      //   >
+                      //     <svg
+                      //       viewBox="0 0 24 24"
+                      //       width="20"
+                      //       height="20"
+                      //       fill="none"
+                      //       stroke="currentColor"
+                      //       strokeWidth="2"
+                      //     >
+                      //       <path
+                      //         d="M15 19l-7-7 7-7"
+                      //         strokeLinecap="round"
+                      //         strokeLinejoin="round"
+                      //       />
+                      //     </svg>
+                      //   </button>
+
+                      //   <span className="m--page-indicator">
+                      //     Page <strong>{currentPage}</strong> of {totalPages}
+                      //   </span>
+
+                      //   <button
+                      //     className="m--pagination-next"
+                      //     onClick={handleNextPage}
+                      //     disabled={currentPage >= totalPages}
+                      //   >
+                      //     <svg
+                      //       viewBox="0 0 24 24"
+                      //       width="20"
+                      //       height="20"
+                      //       fill="none"
+                      //       stroke="currentColor"
+                      //       strokeWidth="2"
+                      //     >
+                      //       <path
+                      //         d="M9 5l7 7-7 7"
+                      //         strokeLinecap="round"
+                      //         strokeLinejoin="round"
+                      //       />
+                      //     </svg>
+                      //   </button>
+                      // </div>
                       <div className="m--pagination">
                         <button
-                          className="m--pagination-prev"
-                          onClick={handlePrevPage}
+                          className="m--page-btn"
+                          onClick={() => setCurrentPage(currentPage - 1)}
                           disabled={currentPage === 1}
                         >
-                          <svg
-                            viewBox="0 0 24 24"
-                            width="20"
-                            height="20"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path
-                              d="M15 19l-7-7 7-7"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                          <span className="material-symbols-outlined">
+                            chevron_left
+                          </span>
                         </button>
 
-                        <span className="m--page-indicator">
-                          Page <strong>{currentPage}</strong> of {totalPages}
-                        </span>
+                        {[...Array(totalPages)].map((_, i) => (
+                          <button
+                            key={i}
+                            className={`m--page-number ${
+                              currentPage === i + 1 ? "active" : ""
+                            }`}
+                            onClick={() => setCurrentPage(i + 1)}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
 
                         <button
-                          className="m--pagination-next"
-                          onClick={handleNextPage}
-                          disabled={currentPage >= totalPages}
+                          className="m--page-btn"
+                          onClick={() => setCurrentPage(currentPage + 1)}
+                          disabled={currentPage === totalPages}
                         >
-                          <svg
-                            viewBox="0 0 24 24"
-                            width="20"
-                            height="20"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path
-                              d="M9 5l7 7-7 7"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                          <span className="material-symbols-outlined">
+                            chevron_right
+                          </span>
                         </button>
                       </div>
                     )}
@@ -548,9 +605,52 @@ const LifeGroup = () => {
                   className="m--form-textarea"
                 />
               </div>
-              <div className="m--form-group">
+              {/* <div className="m--form-group">
                 <label>Logo File</label>
                 <input type="file" onChange={handleFileChange} />
+              </div> */}
+              <div
+                className={`m--form-group m--drag-drop ${isDragging ? "drag-over" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  const droppedFile = e.dataTransfer.files[0];
+                  if (!droppedFile) return;
+                  if (!droppedFile.type.startsWith("image/")) {
+                    setErrorMsg("Only image files are allowed");
+                    return;
+                  }
+                  if (droppedFile.size > 2 * 1024 * 1024) {
+                    setErrorMsg("File size must be less than 2MB");
+                    return;
+                  }
+                  setFile(droppedFile);
+                  setErrorMsg(null);
+                }}
+              >
+                <span className="material-symbols-outlined">cloud_upload</span>
+                <label style={{ cursor: "pointer" }}>
+                  Logo File (Drag & Drop or Click)
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                  <div className="drag-drop-text">
+                    {file
+                      ? file.name
+                      : "Drag and drop an image here, or click to select"}
+                  </div>
+                </label>
               </div>
             </div>
             <div className="m--modal-footer">
@@ -603,9 +703,52 @@ const LifeGroup = () => {
                   className="m--form-textarea"
                 />
               </div>
-              <div className="m--form-group">
+              {/* <div className="m--form-group">
                 <label>Logo (Optional update)</label>
                 <input type="file" onChange={handleFileChange} />
+              </div> */}
+              <div
+                className={`m--form-group m--drag-drop ${isDragging ? "drag-over" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  const droppedFile = e.dataTransfer.files[0];
+                  if (!droppedFile) return;
+                  if (!droppedFile.type.startsWith("image/")) {
+                    setErrorMsg("Only image files are allowed");
+                    return;
+                  }
+                  if (droppedFile.size > 2 * 1024 * 1024) {
+                    setErrorMsg("File size must be less than 2MB");
+                    return;
+                  }
+                  setFile(droppedFile);
+                  setErrorMsg(null);
+                }}
+              >
+                <span className="material-symbols-outlined">cloud_upload</span>
+                <label style={{ cursor: "pointer" }}>
+                  Logo File (Drag & Drop or Click)
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                  <div className="drag-drop-text">
+                    {file
+                      ? file.name
+                      : "Drag and drop an image here, or click to select"}
+                  </div>
+                </label>
               </div>
             </div>
             <div className="m--modal-footer">
@@ -630,12 +773,12 @@ const LifeGroup = () => {
       )}
 
       {isDetailsModalOpen && (
-        <RequestDetailsModal 
-          request={selectedRequest} 
+        <RequestDetailsModal
+          request={selectedRequest}
           onClose={() => {
             setIsDetailsModalOpen(false);
             setSelectedRequest(null);
-          }} 
+          }}
         />
       )}
     </div>
