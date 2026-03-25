@@ -42,6 +42,7 @@ export const baseApi = createApi({
     "trainer",
     "lifegroup",
     "banner",
-    "liveService"
+    "liveService",
+    "biblePlan"
   ],
 });
