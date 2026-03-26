@@ -14,6 +14,8 @@ import {
 } from "@/redux/api/lifeGroup";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { RequestDetailsModal } from "./RequestDetailsModal";
+import DeleteConfirmModal from "./DeleteConfirmModal";
+
 
 type TabType = "groups" | "requests";
 
@@ -33,6 +35,8 @@ const LifeGroup = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | number | null>(null);
   const {
     data: groupsData,
     refetch: refetchGroups,
@@ -154,15 +158,18 @@ const LifeGroup = () => {
     }
   };
 
-  const handleDeleteGroup = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this group?")) return;
-    try {
-      await deleteLifeGroup(id).unwrap();
-      refetchGroups();
-    } catch (err: any) {
-      setErrorMsg(err?.data?.message || "Delete failed");
-    }
-  };
+ const handleDeleteGroup = async () => {
+   if (!deleteId) return;
+
+   try {
+     await deleteLifeGroup(deleteId).unwrap();
+     refetchGroups();
+     setShowDeleteModal(false);
+     setDeleteId(null);
+   } catch (err: any) {
+     setErrorMsg(err?.data?.message || "Delete failed");
+   }
+ };
 
   const handleAddSubmit = async () => {
     try {
@@ -338,7 +345,10 @@ const LifeGroup = () => {
                               </button>
                               <button
                                 className="m--btn-delete"
-                                onClick={() => handleDeleteGroup(group.id)}
+                                onClick={() => {
+                                  setDeleteId(group.id);
+                                  setShowDeleteModal(true);
+                                }}
                               >
                                 Delete
                               </button>
@@ -771,7 +781,17 @@ const LifeGroup = () => {
           </div>
         </div>
       )}
-
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeleteId(null);
+        }}
+        onConfirm={handleDeleteGroup}
+        loading={isDeleting}
+        title="Delete Life Group"
+        message="Are you sure you want to delete this life group?"
+      />
       {isDetailsModalOpen && (
         <RequestDetailsModal
           request={selectedRequest}

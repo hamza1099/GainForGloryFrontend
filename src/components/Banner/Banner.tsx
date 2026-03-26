@@ -198,13 +198,15 @@ import {
   useDeleteBannerMutation,
 } from "@/redux/api/bannerApi";
 import { toast } from "react-toastify"; // React-Toastify import kiya
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 const Banner = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | number | null>(null);
   // RTK Query Hooks
   const { data: banners, isLoading, isError } = useGetAllBannersQuery({});
   const [createBanner, { isLoading: isCreating }] = useCreateBannerMutation();
@@ -230,15 +232,28 @@ const Banner = () => {
     }
   };
 
-  const handleDelete = async (id: string | number) => {
-    if (window.confirm("Are you sure you want to delete this banner?")) {
-      try {
-        await deleteBanner(id).unwrap();
-        toast.success("Banner deleted successfully!"); // Delete Toast
-      } catch (err: any) {
-        toast.error("Failed to delete banner.");
-        console.error(err);
-      }
+  // const handleDelete = async (id: string | number) => {
+  //   if (window.confirm("Are you sure you want to delete this banner?")) {
+  //     try {
+  //       await deleteBanner(id).unwrap();
+  //       toast.success("Banner deleted successfully!"); // Delete Toast
+  //     } catch (err: any) {
+  //       toast.error("Failed to delete banner.");
+  //       console.error(err);
+  //     }
+  //   }
+  // };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      await deleteBanner(deleteId).unwrap();
+      toast.success("Banner deleted successfully!");
+      setShowDeleteModal(false);
+      setDeleteId(null);
+    } catch (err: any) {
+      toast.error("Failed to delete banner.");
     }
   };
 
@@ -290,7 +305,11 @@ const Banner = () => {
                 <div className="m--card-header">
                   <button
                     className="m--card-btn m--card-btn-delete"
-                    onClick={() => handleDelete(banner._id || banner.id)}
+                    // onClick={() => handleDelete(banner._id || banner.id)}
+                    onClick={() => {
+                      setDeleteId(banner._id || banner.id);
+                      setShowDeleteModal(true);
+                    }}
                   >
                     <span className="material-symbols-outlined">delete</span>
                   </button>
@@ -400,6 +419,17 @@ const Banner = () => {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeleteId(null);
+        }}
+        onConfirm={handleDelete}
+        title="Delete Banner"
+        message="Are you sure you want to delete this banner?"
+      />
     </div>
   );
 };
