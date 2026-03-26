@@ -248,19 +248,31 @@ const Banner = () => {
         <div className="m--header">
           <h1 className="m--title">Banner Management</h1>
         </div>
+        {isLoading && <div className="m--loading">Loading banners...</div>}
+        {isError && <div className="m--error">Error loading banners.</div>}
 
         <div className="m--grid">
           {/* Loading & Error States */}
-          {isLoading && <div className="m--loading">Loading banners...</div>}
-          {isError && <div className="m--error">Error loading banners.</div>}
 
           {/* Empty State: Jab banners na hon */}
           {!isLoading && !isError && banners?.data?.length === 0 && (
-            <div className="m--empty-state" style={{ textAlign: 'center', padding: '40px', gridColumn: '1 / -1' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#999' }}>
+            <div
+              className="m--empty-state"
+              style={{
+                textAlign: "center",
+                padding: "40px",
+                gridColumn: "1 / -1",
+              }}
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "48px", color: "#999" }}
+              >
                 imagesmode
               </span>
-              <p style={{ color: '#666', marginTop: '10px' }}>No banners found yet.</p>
+              <p style={{ color: "#666", marginTop: "10px" }}>
+                No banners found yet.
+              </p>
             </div>
           )}
 
@@ -271,7 +283,7 @@ const Banner = () => {
                 <img
                   alt="Banner"
                   className="m--card-img"
-                  src={banner.image || banner.url} 
+                  src={banner.image || banner.url}
                 />
               </div>
               <div className="m--card-content">
@@ -283,7 +295,12 @@ const Banner = () => {
                     <span className="material-symbols-outlined">delete</span>
                   </button>
                   <span className="m--card-date">
-                    {banner.createdAt ? new Date(banner.createdAt).toLocaleDateString() : "Recent"}
+                    <span className="material-symbols-outlined">
+                      calendar_month
+                    </span>
+                    {banner.createdAt
+                      ? new Date(banner.createdAt).toLocaleDateString()
+                      : "Recent"}
                   </span>
                 </div>
               </div>
@@ -321,7 +338,10 @@ const Banner = () => {
                 <div
                   className={`m--upload-area ${dragOver ? "m--upload-area-dragover" : ""}`}
                   onClick={() => fileInputRef.current?.click()}
-                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
                   onDragLeave={() => setDragOver(false)}
                   onDrop={(e) => {
                     e.preventDefault();
