@@ -6,7 +6,7 @@
   margin-right: auto;
   padding-left: 20px;
   padding-right: 20px;
-  padding-top: 6rem;
+  /* padding-top: 6rem;  */
   padding-bottom: 3rem;
   background-color: #fcf9f5;
 }
@@ -33,7 +33,9 @@
   object-fit: cover;
   transition: transform 0.7s ease;
 }
-
+.hm--hero-section.first--hero--section{
+    margin-top: 100px;
+}
 .first--hero--card .hm--hero-card:hover .hm--hero-image {
   transform: scale(1.05);
 }
@@ -351,7 +353,7 @@
   height: 0.5rem;
   background-color: #e2e2e2;
   border-radius: 9999px;
-  max-width: 300px;
+  width: 300px;
   overflow: hidden;
 }
 
@@ -553,7 +555,7 @@
   max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding-bottom: 4rem;
+  /* padding-bottom: 4rem; */
 }
 
 .hm--section-header {
@@ -961,4 +963,28 @@
 
 .hm--check-icon {
   font-variation-settings: "'FILL' 1";
+}
+/* Back Button Styles */
+.hm--back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #f57c00;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.hm--back-button:hover {
+  opacity: 0.7;
+  transform: translateX(-4px);
+}
+
+.hm--back-button .material-symbols-outlined {
+  font-size: 1.25rem;
 }
