@@ -1,0 +1,964 @@
+/* BiblePlans.css */
+/* All classes are prefixed with .hm-- to avoid conflicts */
+
+.hm--main {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+  background-color: #fcf9f5;
+}
+
+/* Hero Section */
+.hm--hero-section {
+  margin-bottom: 4rem;
+}
+
+.hm--hero-card.first--hero--card {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  height: 400px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.first--hero--card .hm--hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.first--hero--card .hm--hero-card:hover .hm--hero-image {
+  transform: scale(1.05);
+}
+
+.first--hero--card .hm--hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(28, 28, 26, 0.7) 0%,
+    rgba(28, 28, 26, 0) 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  padding: 3rem;
+}
+
+.first--hero--card .hm--hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.first--hero--card .hm--hero-badge {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.first--hero--card .hm--hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+
+.first--hero--card .hm--hero-icon-circle {
+  background-color: #f57c00;
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+  border-radius: 9999px;
+  color: white;
+  display: flex;
+}
+
+.first--hero--card .hm--hero-icon {
+  font-size: 2.25rem;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+/* Plans Section */
+.hm--plans-section {
+  margin-top: 2rem;
+}
+
+.hm--section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+}
+
+.hm--section-title {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1c1c1a;
+}
+
+.hm--view-all-link {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #964900;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.hm--view-all-link:hover {
+  text-decoration: underline;
+}
+
+/* Grid Layout */
+.hm--plans-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .hm--plans-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hm--plans-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Plan Card */
+.hm--plan-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.hm--plan-card:hover {
+  transform: translateY(-0.5rem);
+}
+
+.hm--card-image-wrapper {
+  position: relative;
+  height: 12rem;
+  overflow: hidden;
+}
+
+.hm--card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hm--card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.hm--card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.hm--card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1c1c1a;
+  width: 65%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.hm--card-duration {
+  background-color: #f1dccd;
+  color: #6f6054;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.hm--card-description {
+  color: #574235;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.hm--start-button {
+  background: #f57c00;
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.hm--start-button:active {
+  transform: scale(0.98);
+}
+
+/* Material Icons support */
+.material-symbols-outlined {
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+/* list styling  */
+/* BiblePlans.css */
+/* All classes are prefixed with .hm-- to avoid conflicts */
+
+/* Main Container */
+.hm--main {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Hero Section */
+.hm--hero-section {
+  position: relative;
+  height: 320px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.hm--hero-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hm--hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.5);
+}
+
+.hm--hero-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #f9f9f9, rgba(249, 249, 249, 0.4), transparent);
+}
+
+.hm--hero-overlay {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 2.5rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.hm--hero-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .hm--hero-content {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+.hm--hero-text {
+  max-width: 42rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hm--hero-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: rgba(152, 66, 0, 0.2);
+  color: #f57c00;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  backdrop-filter: blur(8px);
+  width: fit-content;
+}
+
+.hm--hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.025em;
+  color: #1a1c1c;
+}
+
+.hm--hero-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm--progress-bar {
+  flex: 1;
+  height: 0.5rem;
+  background-color: #e2e2e2;
+  border-radius: 9999px;
+  max-width: 300px;
+  overflow: hidden;
+}
+
+.hm--progress-fill {
+  height: 100%;
+  background: #f57c00;;
+  width: 40%;
+  border-radius: 9999px;
+}
+
+.hm--progress-text {
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  color: #f57c00;
+}
+
+.hm--continue-button {
+  padding: 1rem 2rem;
+  background: #f57c00;
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  border: none;
+}
+
+.hm--continue-button:hover {
+  opacity: 0.9;
+}
+
+.hm--continue-button:active {
+  transform: scale(0.98);
+}
+
+.hm--button-icon {
+  font-size: 1.25rem;
+}
+
+/* Curriculum Section */
+.hm--curriculum-section {
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 3rem;
+}
+
+.hm--curriculum-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hm--curriculum-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  color: #1a1c1c;
+}
+
+.hm--curriculum-subtitle {
+  color: #5a4138;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Timeline Items */
+.hm--timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hm--timeline-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.hm--timeline-completed {
+  border-left: 4px solid #f57c00;
+}
+
+.hm--timeline-active {
+  border-left: 4px solid #f57c00;;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.hm--timeline-locked {
+  background-color: #eeeeee;
+  opacity: 0.6;
+}
+
+.hm--timeline-icon {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hm--icon-completed {
+  background-color: rgba(152, 66, 0, 0.1);
+  color: #f57c00;
+}
+
+.hm--icon-active {
+  background-color: #f57c00;;
+  color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.hm--icon-locked {
+  background-color: #e2e2e2;
+  color: #5a4138;
+}
+
+.hm--icon-number {
+  font-weight: 700;
+}
+
+.hm--timeline-content {
+  flex: 1;
+}
+
+.hm--timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.hm--timeline-day-title {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #1a1c1c;
+}
+
+.hm--timeline-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+}
+
+.hm--status-completed {
+  color: #f57c00;
+}
+
+.hm--status-active {
+  color: #f57c00;;
+}
+
+.hm--timeline-description {
+  color: #5a4138;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  margin-top: 0.25rem;
+}
+
+.hm--timeline-tags {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.hm--tag {
+  padding: 0.25rem 0.5rem;
+  background-color: #eeeeee;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #5a4138;
+}
+
+/* Bible Plans Grid Section */
+.hm--plans-section {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 4rem;
+}
+
+.hm--section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+}
+
+.hm--section-title {
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1a1c1c;
+}
+
+.hm--view-all-link {
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #f57c00;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.hm--view-all-link:hover {
+  text-decoration: underline;
+}
+
+/* Grid Layout */
+.hm--plans-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .hm--plans-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hm--plans-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Plan Card */
+.hm--plan-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.hm--plan-card:hover {
+  transform: translateY(-0.5rem);
+}
+
+.hm--card-image-wrapper {
+  position: relative;
+  height: 12rem;
+  overflow: hidden;
+}
+
+.hm--card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hm--card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.hm--card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.hm--card-title {
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1c1c;
+}
+
+.hm--card-duration {
+  background-color: #fed3c7;
+  color: #795950;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.hm--card-description {
+  color: #5a4138;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+
+
+/* Material Icons support */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Add these new styles to your existing BiblePlans.css file */
+
+/* Day 2 Detail Section Styles */
+.hm--detail-section {
+  max-width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 4rem;
+}
+
+.hm--detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Detail Header */
+.hm--detail-header {
+  position: relative;
+  margin-bottom: 2rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  aspect-ratio: 21 / 6;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.hm--detail-header-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hm--detail-header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+}
+
+.hm--detail-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.hm--back-icon {
+  color: white;
+  font-size: 1.25rem;
+}
+
+.hm--breadcrumb-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.hm--detail-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .hm--detail-title {
+    font-size: 2.25rem;
+  }
+}
+
+.hm--detail-progress-wrapper {
+  max-width: 20rem;
+}
+
+.hm--detail-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.hm--detail-progress-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hm--detail-progress-bar-container {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.hm--detail-progress-segment {
+  height: 0.25rem;
+  flex: 1;
+  border-radius: 0.125rem;
+}
+
+.hm--progress-filled {
+  background-color: #f57c00;
+}
+
+.hm--progress-empty {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Scripture Section */
+.hm--detail-scripture {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.hm--scripture-icon-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.hm--scripture-icon-wrapper span{
+  width: 2rem;
+  height: 2rem;
+  background-color: rgba(245, 124, 0, 0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hm--scripture-icon {
+  color: #f57c00;
+  font-size: 1.25rem;
+  font-variation-settings: "'FILL' 1";
+}
+
+.hm--scripture-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a1c1c;
+}
+
+.hm--scripture-card {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid #f5f5f5;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.hm--scripture-text {
+  font-size: 1.25rem;
+  font-style: italic;
+  line-height: 1.625;
+  color: #1a1c1c;
+}
+
+/* Devotional Section */
+.hm--devotional-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hm--devotional-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1c1c;
+}
+
+.hm--devotional-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  color: #5a4138;
+  line-height: 1.625;
+}
+
+.hm--devotional-paragraph {
+  font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+  .hm--devotional-paragraph {
+    font-size: 1.125rem;
+  }
+}
+
+/* Reflection Section */
+.hm--reflection-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.hm--reflection-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1c1c;
+}
+
+.hm--reflection-card {
+  background-color: #eeeeee;
+  padding: 2rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hm--reflection-question {
+  color: #5a4138;
+  font-size: 1.125rem;
+  line-height: 1.625;
+}
+
+.hm--reflection-textarea {
+  width: 100%;
+  min-height: 120px;
+  background-color: #ffffff;
+  border: 1px solid #e2e2e2;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  font-size: 1rem;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.hm--reflection-textarea:focus {
+  outline: none;
+  ring: 2px solid rgba(245, 124, 0, 0.2);
+  border-color: rgba(245, 124, 0, 0.4);
+}
+
+.hm--reflection-textarea::placeholder {
+  color: #a0a0a0;
+}
+
+.hm--mark-complete-button {
+  width: 100%;
+  background: linear-gradient(to right, #e65c00, #f57c00);
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.hm--mark-complete-button:hover {
+  opacity: 0.9;
+}
+
+.hm--mark-complete-button:active {
+  transform: scale(0.98);
+}
+
+.hm--check-icon {
+  font-variation-settings: "'FILL' 1";
+}
