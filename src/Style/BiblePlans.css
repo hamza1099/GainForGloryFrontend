@@ -1102,3 +1102,9 @@
   line-height: 1.625;
   margin-top: 0.25rem;
 }
+.errorbox {
+  text-align: center;
+  color: red;
+  font-weight: 700;
+  font-size: 18px;
+}

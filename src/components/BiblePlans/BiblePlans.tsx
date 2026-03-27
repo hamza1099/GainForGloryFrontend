@@ -390,7 +390,7 @@ const BiblePlans: React.FC = () => {
           </div>
 
           {isLoadingPlans ? (
-            <p>Loading plans...</p>
+            <p className="errorbox">Loading plans...</p>
           ) : (
             <div className="hm--plans-grid">
               {allPlans.length > 0 ? (
@@ -472,9 +472,11 @@ const BiblePlans: React.FC = () => {
       {isModalOpen && (
         <div style={modalOverlayStyle}>
           <div style={modalContentStyle}>
-            <h2 style={{ marginTop: 0 }}>Add New Bible Plan</h2>
+            <h2 style={{ marginTop: 0, fontSize: "20px", fontWeight: "700" }}>
+              Add New Bible Plan
+            </h2>
             {isSingleLoading && editId ? (
-              <p>Loading plan details...</p>
+              <p className="errorbox mt-5">Loading plan details...</p>
             ) : (
               <form
                 onSubmit={handleFormSubmit}
