@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, FormEvent, useEffect } from "react";
+import React, { useState, FormEvent, useEffect, useRef } from "react";
 import "../../Style/BiblePlans.css"; // Import the separate CSS file
 
 // TODO: Update this import path to match where your API slice is exported
@@ -46,7 +46,8 @@ const BiblePlans: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [allPlans, setAllPlans] = useState<any[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [isFeaturedModalOpen, setIsFeaturedModalOpen] = useState(false);
   const [featuredTargetId, setFeaturedTargetId] = useState<string | null>(null);
   const [featuredFile, setFeaturedFile] = useState<File | null>(null);
@@ -402,36 +403,47 @@ const BiblePlans: React.FC = () => {
                         src={plan.imageUrl || ""}
                       />
                     </div>
-                    <div className="hm--card-content">
-                      <div className="hm--card-header">
-                        <h3 className="hm--card-title">{plan.title}</h3>
-                        <span className="hm--card-duration">
-                          {plan.totalDays || 0} Days
-                        </span>
-                      </div>
-                      <p className="hm--card-description">{plan.description}</p>
-                      <button
-                        className="hm--start-button"
-                        onClick={() => handleEdit(plan)}
-                        disabled={deletingPlanId === plan.id}
-                      >
-                        edit plan
-                      </button>
+                    <div className="check--box--wrapper">
                       <label className="switch">
                         <input
                           type="checkbox"
                           checked={plan.isFeatured}
                           onChange={() => handleToggleFeatured(plan.id)}
+                          className="custom-checkbox"
                         />
                         <span className="slider round"></span>
                       </label>
-                      <button
-                        className="hm--start-button"
-                        onClick={() => handleDelete(plan.id)}
-                        disabled={deletingPlanId === plan.id}
-                      >
-                        {deletingPlanId === plan.id ? "Deleting..." : "Delete"}
-                      </button>
+                    </div>
+                    <div className="hm--card-content">
+                      <span className="hm--card-duration">
+                        {plan.totalDays || 0} Days
+                      </span>
+                      <div className="hm--card-header">
+                        <h3 className="hm--card-title">{plan.title}</h3>
+                      </div>
+                      <p className="hm--card-description">{plan.description}</p>
+
+                      <div className="edit-dell-btn-wraper">
+                        <button
+                          className="hm--edit-button"
+                          onClick={() => handleEdit(plan)}
+                          disabled={deletingPlanId === plan.id}
+                        >
+                          <span className="material-symbols-outlined">
+                            edit
+                          </span>
+                          edit plan
+                        </button>
+                        <button
+                          className="hm--delete-button"
+                          onClick={() => handleDelete(plan.id)}
+                          disabled={deletingPlanId === plan.id}
+                        >
+                          {deletingPlanId === plan.id
+                            ? "Deleting..."
+                            : "Delete"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -651,12 +663,12 @@ const BiblePlans: React.FC = () => {
       {/* MODAL: UPLOAD FEATURED IMAGE */}
       {/* ================================================= */}
       {isFeaturedModalOpen && (
-        <div style={modalOverlayStyle}>
+        <div style={modalOverlayStyle} className="featuredmodal">
           <div style={modalContentStyle}>
             <h2 style={{ marginTop: 0 }}>Mark as Featured</h2>
             <p>Please upload a high-quality featured image for this plan.</p>
 
-            <div style={{ margin: "20px 0" }}>
+            {/* <div style={{ margin: "20px 0" }}>
               <input
                 type="file"
                 accept="image/*"
@@ -664,6 +676,56 @@ const BiblePlans: React.FC = () => {
                   if (e.target.files?.[0]) setFeaturedFile(e.target.files[0]);
                 }}
                 style={inputStyle}
+              />
+            </div> */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                  setFeaturedFile(e.dataTransfer.files[0]);
+                }
+              }}
+              style={{
+                width: "100%",
+                padding: "30px",
+                borderRadius: "8px",
+                border: isDragging
+                  ? "2px dashed #1D4ED8"
+                  : "2px dashed #4F46E5",
+                backgroundColor: "#f9fafb",
+                color: "#374151",
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "border-color 0.3s",
+                margin: "20px 0",
+              }}
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "36px", color: "#4F46E5" }}
+              >
+                cloud_upload
+              </span>
+              {featuredFile ? (
+                <p>{featuredFile.name}</p>
+              ) : (
+                <p>Drag & drop an image here, or click to select</p>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  if (e.target.files?.[0]) setFeaturedFile(e.target.files[0]);
+                }}
               />
             </div>
 
