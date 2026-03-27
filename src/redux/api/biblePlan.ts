@@ -4,11 +4,11 @@ const biblePlan = baseApi.injectEndpoints({
   endpoints: (build) => ({
     // ==============================
     // Get all bible plans (PAGINATED)
-    // GET /bible-plans/all?page=&limit=
+    // GET /biblePlan/all?page=&limit=
     // ==============================
     getBiblePlans: build.query({
       query: ({ page, limit }) => ({
-        url: `/bible-plans/all?page=${page}&limit=${limit}`,
+        url: `/biblePlan/all?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["biblePlan"],
@@ -16,11 +16,11 @@ const biblePlan = baseApi.injectEndpoints({
 
     // ==============================
     // Get single bible plan details by ID
-    // GET /bible-plans/:id
+    // GET /biblePlan/:id
     // ==============================
     getBiblePlanById: build.query({
       query: (id: string) => ({
-        url: `/bible-plans/${id}`,
+        url: `/biblePlan/${id}`,
         method: "GET",
       }),
       providesTags: ["biblePlan"],
@@ -28,12 +28,12 @@ const biblePlan = baseApi.injectEndpoints({
 
     // ==============================
     // Create bible plan (ADMIN)
-    // POST /bible-plans/create
+    // POST /biblePlan/create
     // Note: Use FormData for image upload
     // ==============================
     createBiblePlan: build.mutation({
       query: (payload) => ({
-        url: `/bible-plans/create`,
+        url: `/biblePlan/create`,
         method: "POST",
         body: payload, // Send as FormData
       }),
@@ -42,11 +42,11 @@ const biblePlan = baseApi.injectEndpoints({
 
     // ==============================
     // Update bible plan (ADMIN)
-    // PUT /bible-plans/update/:id
+    // PUT /biblePlan/update/:id
     // ==============================
     updateBiblePlan: build.mutation({
       query: ({ id, data }) => ({
-        url: `/bible-plans/update/${id}`,
+        url: `/biblePlan/update/${id}`,
         method: "PUT",
         body: data, // Send as FormData if image is included
       }),
@@ -55,11 +55,11 @@ const biblePlan = baseApi.injectEndpoints({
 
     // ==============================
     // Update Featured Image (ADMIN)
-    // PUT /bible-plans/updateFeatured/:id
+    // PUT /biblePlan/updateFeatured/:id
     // ==============================
     updateFeaturedBiblePlan: build.mutation({
       query: ({ id, data }) => ({
-        url: `/bible-plans/updateFeatured/${id}`,
+        url: `/biblePlan/updateFeatured/${id}`,
         method: "PUT",
         body: data, // Send as FormData (contains featured image)
       }),
@@ -68,11 +68,11 @@ const biblePlan = baseApi.injectEndpoints({
 
     // ==============================
     // Delete bible plan (ADMIN)
-    // DELETE /bible-plans/delete/:id
+    // DELETE /biblePlan/delete/:id
     // ==============================
     deleteBiblePlan: build.mutation({
       query: (id: string) => ({
-        url: `/bible-plans/delete/${id}`,
+        url: `/biblePlan/delete/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["biblePlan"],
@@ -80,11 +80,11 @@ const biblePlan = baseApi.injectEndpoints({
 
     // ==============================
     // Delete specific plan day (ADMIN)
-    // DELETE /bible-plans/deletePlanDay/:id
+    // DELETE /biblePlan/deletePlanDay/:id
     // ==============================
     deleteBiblePlanDay: build.mutation({
       query: (id: string) => ({
-        url: `/bible-plans/deletePlanDay/${id}`,
+        url: `/biblePlan/deletePlanDay/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["biblePlan"],

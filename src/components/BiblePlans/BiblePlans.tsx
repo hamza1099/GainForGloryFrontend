@@ -1,492 +1,768 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import "../../Style/BiblePlans.css"; // Import the separate CSS file
 
-const BiblePlans = () => {
-  // State to track which step is active (1, 2, or 3)
-  const [activeStep, setActiveStep] = useState(1);
-  // State to track selected plan
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  // State to track selected day for detailed view
-  const [selectedDay, setSelectedDay] = useState(null);
+// TODO: Update this import path to match where your API slice is exported
+import {
+  useGetBiblePlansQuery,
+  useCreateBiblePlanMutation,
+  useUpdateBiblePlanMutation,
+  useGetBiblePlanByIdQuery,
+  useDeleteBiblePlanMutation,
+  useUpdateFeaturedBiblePlanMutation,
+} from "../../redux/api/biblePlan";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-  // Handle starting a plan
-  const handleStartPlan = (planName) => {
-    setSelectedPlan(planName);
-    setActiveStep(2);
+// ==========================================
+// TYPESCRIPT INTERFACES
+// ==========================================
+
+export interface DayPlan {
+  title: string;
+  devotionalText: string;
+  reflectionQuestion: string;
+  verse: string;
+  verseReference: string;
+}
+
+export interface BiblePlanData {
+  id?: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  days: DayPlan[];
+}
+
+interface FormDataState {
+  title: string;
+  description: string;
+  imageFile: File | null;
+  days: DayPlan[];
+}
+
+const BiblePlans: React.FC = () => {
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [allPlans, setAllPlans] = useState<any[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+
+  const [isFeaturedModalOpen, setIsFeaturedModalOpen] = useState(false);
+  const [featuredTargetId, setFeaturedTargetId] = useState<string | null>(null);
+  const [featuredFile, setFeaturedFile] = useState<File | null>(null);
+
+  // Pagination State for API
+  const [page, setPage] = useState<number>(1);
+  const limit: number = 10;
+
+  // --- API HOOKS ---
+  const { data: plansData, isLoading: isLoadingPlans } = useGetBiblePlansQuery({
+    page,
+    limit,
+  });
+  const { data: singlePlanData, isLoading: isSingleLoading } =
+    useGetBiblePlanByIdQuery(selectedPlanId!, {
+      skip: !selectedPlanId,
+    });
+
+  const [deleteBiblePlan, { isLoading: isDeleting }] =
+    useDeleteBiblePlanMutation();
+  const [deletingPlanId, setDeletingPlanId] = useState<string | null>(null);
+  const [updateFeaturedBiblePlan, { isLoading: isFeaturing }] =
+    useUpdateFeaturedBiblePlanMutation();
+
+  const [createBiblePlan, { isLoading: isCreating }] =
+    useCreateBiblePlanMutation();
+  const [updateBiblePlan, { isLoading: isUpdating }] =
+    useUpdateBiblePlanMutation();
+  const [editId, setEditId] = useState<string | null>(null);
+
+  // --- FORM STATE FOR CREATE PLAN ---
+  const [formData, setFormData] = useState<FormDataState>({
+    title: "",
+    description: "",
+    imageFile: null,
+    days: [
+      {
+        title: "",
+        devotionalText: "",
+        reflectionQuestion: "",
+        verse: "",
+        verseReference: "",
+      },
+    ],
+  });
+
+  useEffect(() => {
+    if (singlePlanData?.data) {
+      const plan = singlePlanData.data;
+
+      setFormData({
+        title: plan.title || "",
+        description: plan.description || "",
+        imageFile: null,
+        days:
+          plan.days?.length > 0
+            ? plan.days
+            : [
+                {
+                  title: "",
+                  devotionalText: "",
+                  reflectionQuestion: "",
+                  verse: "",
+                  verseReference: "",
+                },
+              ],
+      });
+    }
+  }, [singlePlanData]);
+
+  useEffect(() => {
+    if (plansData?.data) {
+      setAllPlans((prev) => {
+        // Agar page 1 hai toh purana data khatam karke naya set karein
+        if (page === 1) return plansData.data;
+
+        // Duplicate check: Sirf wo plans add karein jo pehle se state mein nahi hain
+        const existingIds = new Set(prev.map((p) => p.id));
+        const newPlans = plansData.data.filter(
+          (p: any) => !existingIds.has(p.id),
+        );
+
+        return [...prev, ...newPlans];
+      });
+    }
+  }, [plansData, page]);
+  const featuredPlan = allPlans.find((p: any) => p.isFeatured);
+
+  // --- MODAL FORM HANDLERS ---
+  const handleAddDay = () => {
+    setFormData({
+      ...formData,
+      days: [
+        ...formData.days,
+        {
+          title: "",
+          devotionalText: "",
+          reflectionQuestion: "",
+          verse: "",
+          verseReference: "",
+        },
+      ],
+    });
   };
 
-  // Handle continuing to next day
-  const handleContinueDay = () => {
-    setActiveStep(3);
-    setSelectedDay(3); // Day 3 as active
+  const handleDayChange = (
+    index: number,
+    field: keyof DayPlan,
+    value: string,
+  ) => {
+    const newDays = [...formData.days];
+    newDays[index][field] = value;
+    setFormData({ ...formData, days: newDays });
   };
 
-  // Handle viewing a specific day from timeline
-  const handleViewDay = (dayNumber) => {
-    setSelectedDay(dayNumber);
-    setActiveStep(3);
-  };
-
-  // Handle going back to previous step
-  const handleGoBack = () => {
-    if (activeStep === 3) {
-      setActiveStep(2);
-    } else if (activeStep === 2) {
-      setActiveStep(1);
-      setSelectedPlan(null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFormData({ ...formData, imageFile: e.target.files[0] });
     }
   };
 
-  // Handle marking day as complete
-  const handleMarkComplete = () => {
-    // Logic to mark day as complete
-    alert(`Day ${selectedDay} marked as complete!`);
-    // Go back to step 2 after completion
-    setActiveStep(2);
+  const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // ✅ VALIDATIONS
+    // Validations with Toast Warning
+    if (!formData.title.trim()) return toast.warning("Title is required");
+    if (!formData.description.trim())
+      return toast.warning("Description is required");
+    if (!formData.imageFile && !editId)
+      return toast.warning("Image is required");
+    for (let i = 0; i < formData.days.length; i++) {
+      const day = formData.days[i];
+
+      if (
+        !day.title ||
+        !day.devotionalText ||
+        !day.reflectionQuestion ||
+        !day.verse ||
+        !day.verseReference
+      ) {
+        alert(`All fields required in Day ${i + 1}`);
+        return;
+      }
+    }
+    const cleanedDays = formData.days.map((day) => ({
+      title: day.title,
+      devotionalText: day.devotionalText,
+      reflectionQuestion: day.reflectionQuestion,
+      verse: day.verse,
+      verseReference: day.verseReference,
+    }));
+
+    // ✅ BODY DATA (NO FILE HERE)
+    const bodyDataJson = {
+      title: formData.title,
+      description: formData.description,
+      days: cleanedDays,
+    };
+
+    const submitData = new FormData();
+
+    // 🔥 IMPORTANT (Postman jaisa)
+    submitData.append("bodyData", JSON.stringify(bodyDataJson));
+
+    // 🔥 image optional in update
+    if (formData.imageFile) {
+      submitData.append("biblePlanImage", formData.imageFile);
+    }
+    try {
+      if (editId) {
+        // ✅ UPDATE CALL
+        await updateBiblePlan({
+          id: editId,
+          data: submitData,
+        }).unwrap();
+        toast.success("Bible Plan Updated Successfully!");
+      } else {
+        // ✅ CREATE CALL
+        await createBiblePlan(submitData).unwrap();
+
+        toast.success("Bible Plan Created Successfully!");
+      }
+
+      handleCloseModal();
+      setEditId(null);
+    } catch (error) {
+      console.error("Failed to create plan: ", error);
+      toast.error("Operation failed. Please try again.");
+    }
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditId(null);
+    setSelectedPlanId(null);
+    // 🔥 RESET EVERYTHING
+    setFormData({
+      title: "",
+      description: "",
+      imageFile: null,
+      days: [
+        {
+          title: "",
+          devotionalText: "",
+          reflectionQuestion: "",
+          verse: "",
+          verseReference: "",
+        },
+      ],
+    });
+  };
+
+  const handleEdit = (plan: any) => {
+    setEditId(plan.id);
+    setSelectedPlanId(plan.id);
+    setFormData({
+      title: plan.title,
+      description: plan.description,
+      imageFile: null, // image optional on edit
+      days: plan.days || [
+        {
+          title: "",
+          devotionalText: "",
+          reflectionQuestion: "",
+          verse: "",
+          verseReference: "",
+        },
+      ],
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (planId: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this Bible Plan?",
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setDeletingPlanId(planId); // Start loading for this specific plan
+      await deleteBiblePlan(planId).unwrap();
+      toast.success("Bible Plan deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete plan:", error);
+      toast.error("Failed to delete plan.");
+    } finally {
+      setDeletingPlanId(null); // Reset loading state
+    }
+  };
+
+  const handleToggleFeatured = (planId: string) => {
+    const plan = allPlans.find((p) => p.id === planId);
+    if (plan?.isFeatured) {
+      return;
+    }
+    setFeaturedTargetId(planId);
+    setIsFeaturedModalOpen(true);
+  };
+
+  const handleFeaturedSubmit = async () => {
+    if (!featuredFile || !featuredTargetId) {
+      return toast.warning("Please select an image first");
+    }
+
+    const formData = new FormData();
+    // Image key matching Postman: biblePlanFeaturedImage
+    formData.append("biblePlanFeaturedImage", featuredFile);
+
+    try {
+      await updateFeaturedBiblePlan({
+        id: featuredTargetId,
+        data: formData,
+      }).unwrap();
+      toast.success("Plan is now featured!");
+
+      // Update local state
+      setAllPlans((prev) =>
+        prev.map((p) => ({
+          ...p,
+          isFeatured: p.id === featuredTargetId,
+        })),
+      );
+
+      // Reset & Close
+      setIsFeaturedModalOpen(false);
+      setFeaturedFile(null);
+      setFeaturedTargetId(null);
+    } catch (error) {
+      console.error("Failed to feature plan:", error);
+      toast.error("Failed to feature plan");
+    }
+  };
   return (
     <main className="hm--main">
-      {/* STEP 1: DISCOVERY - Browse and Select Plans */}
-      {activeStep === 1 && (
-        <>
-          {/* Hero Banner */}
-          <section className="hm--hero-section first--hero--section">
-            <div className="hm--hero-card first--hero--card">
-              <img
-                alt="Bible in sunlight"
-                className="hm--hero-image"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkNWkn7VBR9WhzXac11cZGjmX0PHRxooR2dfD14N2QHS869eCfsMw7SKOrasfgZLa4JWInPxkfIE89VMJk2ZaO7nApEAFPLf2XHeKnGPnZ9dDpwD97VkXAd13rPc2dMDbZUt5-gPCtNeyEDyt1QouaPH4fP_xeUqHibCQCBlx_k5Lam36Onn58ztKimze3PDIRXLsvTKhTxusIKT97XfIH95X8K-Oo4H820hOpv4zkDUBvI0Xwpwtn5LEX5pvozZJR5azzoFMvfBs"
-              />
-              <div className="hm--hero-overlay">
-                <div className="hm--hero-content">
-                  <div>
-                    <span className="hm--hero-badge">Recommended for you</span>
-                    <h1 className="hm--hero-title">This Weeks Bible Plan</h1>
-                  </div>
-                  <div className="hm--hero-icon-circle">
-                    <span className="material-symbols-outlined hm--hero-icon">
-                      chevron_right
-                    </span>
-                  </div>
+      <ToastContainer position="top-right" autoClose={3000} />
+      <>
+        <section className="hm--hero-section first--hero--section">
+          <div className="hm--hero-card first--hero--card">
+            <img
+              alt="Bible in sunlight"
+              className="hm--hero-image"
+              src={
+                featuredPlan?.featuredImage ||
+                featuredPlan?.imageUrl ||
+                "https://lh3.googleusercontent.com/aida-public/AB6AXuBkNWkn7VBR9WhzXac11cZGjmX0PHRxooR2dfD14N2QHS869eCfsMw7SKOrasfgZLa4JWInPxkfIE89VMJk2ZaO7nApEAFPLf2XHeKnGPnZ9dDpwD97VkXAd13rPc2dMDbZUt5-gPCtNeyEDyt1QouaPH4fP_xeUqHibCQCBlx_k5Lam36Onn58ztKimze3PDIRXLsvTKhTxusIKT97XfIH95X8K-Oo4H820hOpv4zkDUBvI0Xwpwtn5LEX5pvozZJR5azzoFMvfBs"
+              }
+            />
+            <div className="hm--hero-overlay">
+              <div className="hm--hero-content">
+                <div>
+                  <span className="hm--hero-badge">Recommended for you</span>
+                  <h1 className="hm--hero-title">This Weeks Bible Plan</h1>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Plan Discovery Grid */}
-          <section className="hm--plans-section">
-            <div className="hm--section-header">
-              <h2 className="hm--section-title">Bible Plans</h2>
-              <a className="hm--view-all-link" href="#">
-                SEE ALL PLANS
-              </a>
+        <section className="hm--plans-section">
+          <div className="hm--section-header">
+            <h2 className="hm--section-title">Bible Plans</h2>
+            <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                style={{
+                  backgroundColor: "#4F46E5",
+                  color: "white",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                + Add Plan
+              </button>
             </div>
+          </div>
+
+          {isLoadingPlans ? (
+            <p>Loading plans...</p>
+          ) : (
             <div className="hm--plans-grid">
-              {/* Plan Card 1 */}
-              <div className="hm--plan-card">
-                <div className="hm--card-image-wrapper">
-                  <img
-                    alt="Discipline thumbnail"
-                    className="hm--card-image"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuASsYz9qcYGf8tShPWnQ_N5dlEdyRz6_6ZcA7iD9YEsjzWm7U5JMbI04MPQ0SHd9OK1zjMoBy5p0Rg8WZ4Zhogx9pgTHqM-C00woQqBDpnNSbXU5uXdTaUZLvUIJ1J3nUyBsV2WkPu6fUuxC_5NwtivR-6ZkR1ObHgIh-EBh_WQXCs3zOup_tDraxGiSYR04N1pYKFfbMBwIdOMnnEvwyDjMcJbYTZEY85ZKjGPno2NLMiPPMuEbzTaxBQGe0dcSMme36ZYL7WeeCQ"
-                  />
-                </div>
-                <div className="hm--card-content">
-                  <div className="hm--card-header">
-                    <h3 className="hm--card-title">Discipline</h3>
-                    <span className="hm--card-duration">5 Days</span>
-                  </div>
-                  <p className="hm--card-description">
-                    Build spiritual foundations through daily prayer and
-                    consistent scripture engagement.
-                  </p>
-                  <button
-                    className="hm--start-button"
-                    onClick={() => handleStartPlan("Discipline")}
-                  >
-                    Start Plan
-                  </button>
-                </div>
-              </div>
-
-              {/* Plan Card 2 */}
-              <div className="hm--plan-card">
-                <div className="hm--card-image-wrapper">
-                  <img
-                    alt="Anxiety thumbnail"
-                    className="hm--card-image"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKGWuir8kKTf6JQqNk2jAyMl2YswJDmms_X3P_V9LCDkgdYCv9wqLMtT7LPElWgtRmgZEvnK1nuvf1xAdNGoIa7tmd8xgwAg49l7h15NKC20wSHDPz0IaHlCMtG5W-r4McrTvQQVmA1cE59m2pngS3Y0e503i4Jv6Vag4iUNTBE4ubTgDl6w-Atk98L0oYfgeCr7A0CJ9ixV8vqOC3LIadFZvne01uaAIJIFVpWs70K-BDD9RoQv7jluqYt_bIrYkf_2Wc3esmUUA"
-                  />
-                </div>
-                <div className="hm--card-content">
-                  <div className="hm--card-header">
-                    <h3 className="hm--card-title">Anxiety</h3>
-                    <span className="hm--card-duration">7 Days</span>
-                  </div>
-                  <p className="hm--card-description">
-                    Finding rest and quiet for your soul in times of
-                    overwhelming worry.
-                  </p>
-                  <button
-                    className="hm--start-button"
-                    onClick={() => handleStartPlan("Anxiety")}
-                  >
-                    Start Plan
-                  </button>
-                </div>
-              </div>
-
-              {/* Plan Card 3 */}
-              <div className="hm--plan-card">
-                <div className="hm--card-image-wrapper">
-                  <img
-                    alt="Purpose thumbnail"
-                    className="hm--card-image"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkENnwugV41cUozOdALwEFX462FtVoKxeljgiPZ0Vbs30mWtyElxoGExpens0Q0ezX5_-BGtWM17Wg_-YWI1d_HfxfkOdOO822dEX_AU2PvxKKXtfnRN5p4TB8-NiJyaMKKTCP1SYb0987TRJ7RQi0BytQ7b7_Xd3n0K_SGUmxCxTfz0XKs9SRsgt1pScbogvY7s3hBP9yTNJDxL2u2ijrx71FnKrlPFDSSwrY8zBGXaQG6lLv6hvIenksWe0uMPk7M8nInJZGJK4"
-                  />
-                </div>
-                <div className="hm--card-content">
-                  <div className="hm--card-header">
-                    <h3 className="hm--card-title">Purpose</h3>
-                    <span className="hm--card-duration">4 Days</span>
-                  </div>
-                  <p className="hm--card-description">
-                    Discovering Gods unique design for your life and your
-                    specific calling.
-                  </p>
-                  <button
-                    className="hm--start-button"
-                    onClick={() => handleStartPlan("Purpose")}
-                  >
-                    Start Plan
-                  </button>
-                </div>
-              </div>
-
-              {/* Plan Card 4 */}
-              <div className="hm--plan-card">
-                <div className="hm--card-image-wrapper">
-                  <img
-                    alt="Strength + Faith thumbnail"
-                    className="hm--card-image"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCaynF3EmHkV1L1o14VUb4uL-3eNy5XtzTJp5BKJzQYFKKzM4J949wnor8cYJBHFxUhT-kpThk_QtHWkNHDwslFU_CBhaodwlwiRsuC7RQV907tkvkegdLcGXsMLIb3BUS3_fBh2840GgIp0LW9EfGq7lMzly-nUh2PMmZyV86X3tgxbxNR0zVWNgGQp_fA--EXjI7DHyq7-IgHOPuj2FheRfSeLusq8hCPzaBV_WlzL0VplycVNFlkclNnY5-GkwuNljnVwY814Y"
-                  />
-                </div>
-                <div className="hm--card-content">
-                  <div className="hm--card-header">
-                    <h3 className="hm--card-title">Strength + Faith</h3>
-                    <span className="hm--card-duration">7 Days</span>
-                  </div>
-                  <p className="hm--card-description">
-                    Cultivating a resilient spirit that stands firm regardless
-                    of the seasons of life.
-                  </p>
-                  <button
-                    className="hm--start-button"
-                    onClick={() => handleStartPlan("Strength + Faith")}
-                  >
-                    Start Plan
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        </>
-      )}
-
-      {/* STEP 2: ACTIVE PLAN OVERVIEW - Current Plan Progress */}
-      {activeStep === 2 && (
-        <>
-          {/* Back Button */}
-          <button className="hm--back-button" onClick={handleGoBack}>
-            <span className="material-symbols-outlined">arrow_back</span>
-            Back to Plans
-          </button>
-
-          {/* Active Journey Hero */}
-          <section className="hm--hero-section">
-            <div className="hm--hero-card">
-              <img
-                alt="Sacred study space"
-                className="hm--hero-image"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAADSe6pbGAv-yXCVZloPIr8tp6vQSWtZ3kdSYi1ZALIPzTYGZg5tlnDHIpi25-Sxkd-imMJ3e8sfDTAsQHFfy3sKIkgEoWMf4gFaZ10LUI8IW1XboSMrV8ZZ9fviv2L5Tx0-VHcc6B1vxjyLGB8rmMwp9iZ9iSA84ytwpr7n4q1Jymg7UReQH-SFjTPHfRqPHWhlwPexYbx42jqVZCqVtaqFcWORj0Oi0cctIOr1vF8W8aw4MPXbO10IaQeN6GL-X2egJ66h_fxJDU"
-              />
-              <div className="hm--hero-gradient"></div>
-              <div className="hm--hero-overlay">
-                <div className="hm--hero-content">
-                  <div className="hm--hero-text">
-                    <h2 className="hm--hero-title">
-                      {selectedPlan || "Walking in Discipline"}
-                    </h2>
-                    <div className="hm--hero-progress">
-                      <div className="hm--progress-bar">
-                        <div className="hm--progress-fill"></div>
+              {allPlans.length > 0 ? (
+                allPlans.map((plan) => (
+                  <div className="hm--plan-card" key={plan.id}>
+                    <div className="hm--card-image-wrapper">
+                      <img
+                        alt={`${plan.title} thumbnail`}
+                        className="hm--card-image"
+                        src={plan.imageUrl || ""}
+                      />
+                    </div>
+                    <div className="hm--card-content">
+                      <div className="hm--card-header">
+                        <h3 className="hm--card-title">{plan.title}</h3>
+                        <span className="hm--card-duration">
+                          {plan.totalDays || 0} Days
+                        </span>
                       </div>
-                      <span className="hm--progress-text">
-                        2/5 Days Complete
-                      </span>
+                      <p className="hm--card-description">{plan.description}</p>
+                      <button
+                        className="hm--start-button"
+                        onClick={() => handleEdit(plan)}
+                        disabled={deletingPlanId === plan.id}
+                      >
+                        edit plan
+                      </button>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          checked={plan.isFeatured}
+                          onChange={() => handleToggleFeatured(plan.id)}
+                        />
+                        <span className="slider round"></span>
+                      </label>
+                      <button
+                        className="hm--start-button"
+                        onClick={() => handleDelete(plan.id)}
+                        disabled={deletingPlanId === plan.id}
+                      >
+                        {deletingPlanId === plan.id ? "Deleting..." : "Delete"}
+                      </button>
                     </div>
                   </div>
+                ))
+              ) : (
+                <p>No plans available. Add one!</p>
+              )}
+              {plansData?.meta?.page < plansData?.meta?.totalPages && (
+                <div style={{ textAlign: "center", marginTop: "20px" }}>
                   <button
-                    className="hm--continue-button"
-                    onClick={handleContinueDay}
+                    className="hm--start-button"
+                    onClick={() => setPage((prev) => prev + 1)}
+                    disabled={isLoadingPlans}
                   >
-                    <span>Continue Day 3</span>
-                    <span className="material-symbols-outlined hm--button-icon">
-                      arrow_forward
-                    </span>
+                    {isLoadingPlans ? "Loading..." : "Load More"}
                   </button>
                 </div>
-              </div>
+              )}
             </div>
-          </section>
+          )}
+        </section>
+      </>
 
-          {/* Plan Curriculum Timeline */}
-          <section className="hm--curriculum-section">
-            <div className="hm--curriculum-header">
-              <h3 className="hm--curriculum-title">Plan Curriculum</h3>
-              <span className="hm--curriculum-subtitle">
-                5 Lessons • Estimated 15 min / day
-              </span>
-            </div>
-            <div className="hm--timeline">
-              {/* Day 1: Completed */}
-              <div
-                className="hm--timeline-item hm--timeline-completed"
-                onClick={() => handleViewDay(1)}
+      {/* ================================================= */}
+      {/* MODAL: CREATE NEW BIBLE PLAN */}
+      {/* ================================================= */}
+      {isModalOpen && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h2 style={{ marginTop: 0 }}>Add New Bible Plan</h2>
+            {isSingleLoading && editId ? (
+              <p>Loading plan details...</p>
+            ) : (
+              <form
+                onSubmit={handleFormSubmit}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                }}
               >
-                <div className="hm--timeline-icon hm--icon-completed">
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    check_circle
-                  </span>
-                </div>
-                <div className="hm--timeline-content">
-                  <div className="hm--timeline-header">
-                    <h4 className="hm--timeline-day-title">
-                      Day 1: Self-Control
-                    </h4>
-                    <span className="hm--timeline-status hm--status-completed">
-                      Completed
-                    </span>
-                  </div>
-                  <p className="hm--timeline-description">
-                    Understanding the biblical foundations of restraining the
-                    flesh for spiritual growth.
-                  </p>
-                </div>
-              </div>
-
-              {/* Day 2: Completed */}
-              <div
-                className="hm--timeline-item hm--timeline-completed"
-                onClick={() => handleViewDay(2)}
-              >
-                <div className="hm--timeline-icon hm--icon-completed">
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    check_circle
-                  </span>
-                </div>
-                <div className="hm--timeline-content">
-                  <div className="hm--timeline-header">
-                    <h4 className="hm--timeline-day-title">Day 2: Diligence</h4>
-                    <span className="hm--timeline-status hm--status-completed">
-                      Completed
-                    </span>
-                  </div>
-                  <p className="hm--timeline-description">
-                    The call to labor faithfully in whatever station God has
-                    placed you.
-                  </p>
-                </div>
-              </div>
-
-              {/* Day 3: Active */}
-              <div
-                className="hm--timeline-item hm--timeline-active"
-                onClick={() => handleViewDay(3)}
-              >
-                <div className="hm--timeline-icon hm--icon-active">
-                  <span className="hm--icon-number">03</span>
-                </div>
-                <div className="hm--timeline-content">
-                  <div className="hm--timeline-header">
-                    <h4 className="hm--timeline-day-title">Day 3: Obedience</h4>
-                    <span className="hm--timeline-status hm--status-active">
-                      Up Next
-                    </span>
-                  </div>
-                  <p className="hm--timeline-description">
-                    Surrendering your will to the Divine path even when the road
-                    is narrow.
-                  </p>
-                  <div className="hm--timeline-tags">
-                    <span className="hm--tag">12 MIN READ</span>
-                    <span className="hm--tag">REFLECTION</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Day 4: Locked */}
-              <div className="hm--timeline-item hm--timeline-locked">
-                <div className="hm--timeline-icon hm--icon-locked">
-                  <span className="material-symbols-outlined">lock</span>
-                </div>
-                <div className="hm--timeline-content">
-                  <h4 className="hm--timeline-day-title">
-                    Day 4: Perseverance
-                  </h4>
-                  <p className="hm--timeline-description">
-                    How to stand firm when spiritual fatigue sets in during the
-                    middle of the journey.
-                  </p>
-                </div>
-              </div>
-
-              {/* Day 5: Locked */}
-              <div className="hm--timeline-item hm--timeline-locked">
-                <div className="hm--timeline-icon hm--icon-locked">
-                  <span className="material-symbols-outlined">lock</span>
-                </div>
-                <div className="hm--timeline-content">
-                  <h4 className="hm--timeline-day-title">
-                    Day 5: Prayer & Fasting
-                  </h4>
-                  <p className="hm--timeline-description">
-                    Culminating the plan with the most vital tools for
-                    maintaining a disciplined soul.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-        </>
-      )}
-
-      {/* STEP 3: DAILY CONTENT - Detailed Lesson View */}
-      {activeStep === 3 && (
-        <>
-          {/* Back Button */}
-          <button className="hm--back-button" onClick={handleGoBack}>
-            <span className="material-symbols-outlined">arrow_back</span>
-            Back to Curriculum
-          </button>
-
-          <section className="hm--detail-section">
-            <div className="hm--detail-container">
-              {/* Content Header with Image */}
-              <div className="hm--detail-header">
-                <img
-                  alt="Plan Header"
-                  className="hm--detail-header-image"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy9fnYU1Nrp2rOqBhF3T52qUHCgtDsaJl-A-ih08IujUpWQDzmkUq0RQhnlPS99de6iXO3DWSNOJhVVGawWkTD9pWioZyE9U1ZrvG9zVe62CnuTdXbPNj58SKqEfQ-H7JN0KbaFCBwBS6RCHF8DkUd-O1A8GtT01T5eH0ipDA6JjHO3gZPR5KgALqu7Ji2NUJGacJ8rD4kaA8VT8utN8wFLoDCPpS79XxphFT3lUbYXFC66G8BKyESRXD-Q243O3Gwgmotg6h4TLB-"
+                <input
+                  required
+                  type="text"
+                  placeholder="Plan Title"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  style={inputStyle}
                 />
-                <div className="hm--detail-header-overlay">
-                  <div className="hm--detail-breadcrumb">
-                    <span className="hm--breadcrumb-text">
-                      {selectedPlan || "Walking in Discipline"}
-                    </span>
-                  </div>
-                  <h2 className="hm--detail-title">
-                    Day {selectedDay} -{" "}
-                    {selectedDay === 3
-                      ? "Obedience"
-                      : selectedDay === 2
-                        ? "Diligence"
-                        : "Self-Control"}
-                  </h2>
-                  <div className="hm--detail-progress-wrapper">
-                    <div className="hm--detail-progress-header">
-                      <span className="hm--detail-progress-label">
-                        {selectedDay === 3
-                          ? "2/5 Days Complete"
-                          : "2/5 Days Complete"}
-                      </span>
-                    </div>
-                    <div className="hm--detail-progress-bar-container">
-                      <div className="hm--detail-progress-segment hm--progress-filled"></div>
-                      <div className="hm--detail-progress-segment hm--progress-filled"></div>
-                      <div className="hm--detail-progress-segment hm--progress-empty"></div>
-                      <div className="hm--detail-progress-segment hm--progress-empty"></div>
-                      <div className="hm--detail-progress-segment hm--progress-empty"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Scripture Section */}
-              <div className="hm--detail-scripture">
-                <div className="hm--scripture-icon-wrapper">
-                  <span className="material-symbols-outlined hm--scripture-icon">
-                    book
-                  </span>
-                  <h3 className="hm--scripture-title">
-                    {selectedDay === 3 ? "Proverbs 13:4" : "Proverbs 13:4"}
-                  </h3>
-                </div>
+                <textarea
+                  required
+                  placeholder="Plan Description"
+                  rows={3}
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  style={inputStyle}
+                />
 
-                <div className="hm--scripture-card">
-                  <p className="hm--scripture-text">
-                    The soul of the sluggard craves and gets nothing, while the
-                    soul of the diligent is richly supplied.
-                  </p>
-                </div>
-              </div>
-
-              {/* Devotional Section */}
-              <div className="hm--devotional-section">
-                <h3 className="hm--devotional-title">Devotional</h3>
-                <div className="hm--devotional-content">
-                  <p className="hm--devotional-paragraph">
-                    Diligence is key to a disciplined life. God calls us to work
-                    diligently, as a reflection of our commitment to Him.
-                  </p>
-                  <p className="hm--devotional-paragraph">
-                    Are you giving your best in your spiritual pursuits?
-                    Diligence is not about perfection but consistent, steady
-                    effort. Today, ask God to help you stay focused on the tasks
-                    He has set before you.
-                  </p>
-                </div>
-              </div>
-
-              {/* Reflection Section */}
-              <div className="hm--reflection-section">
-                <h3 className="hm--reflection-title">Reflection</h3>
-                <div className="hm--reflection-card">
-                  <p className="hm--reflection-question">
-                    In what area of your life do you need to cultivate more
-                    diligence?
-                  </p>
-                  <textarea
-                    className="hm--reflection-textarea"
-                    placeholder="Write your notes here..."
-                    rows={4}
-                  ></textarea>
-                  <button
-                    className="hm--mark-complete-button"
-                    onClick={handleMarkComplete}
+                <div>
+                  <label
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      display: "block",
+                      marginBottom: "5px",
+                    }}
                   >
-                    <span className="material-symbols-outlined hm--check-icon">
-                      check_box
-                    </span>
-                    Mark Complete
+                    Feature Image (Upload)
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={inputStyle}
+                  />
+                </div>
+
+                <hr
+                  style={{
+                    width: "100%",
+                    borderColor: "#e5e7eb",
+                    borderWidth: "1px",
+                  }}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <h3 style={{ margin: 0 }}>Days Curriculum</h3>
+                  <button
+                    type="button"
+                    onClick={handleAddDay}
+                    style={addBtnStyle}
+                  >
+                    + Add Day
                   </button>
                 </div>
-              </div>
+
+                <div
+                  style={{
+                    maxHeight: "300px",
+                    overflowY: "auto",
+                    paddingRight: "10px",
+                  }}
+                >
+                  {formData.days.map((day, index) => (
+                    <div key={index} style={dayCardStyle}>
+                      <h4 style={{ margin: "0 0 10px 0" }}>Day {index + 1}</h4>
+                      <input
+                        required
+                        type="text"
+                        placeholder="Day Title (e.g., Day 1: Peace)"
+                        value={day.title}
+                        onChange={(e) =>
+                          handleDayChange(index, "title", e.target.value)
+                        }
+                        style={inputStyle}
+                      />
+                      <textarea
+                        required
+                        placeholder="Devotional Text"
+                        rows={2}
+                        value={day.devotionalText}
+                        onChange={(e) =>
+                          handleDayChange(
+                            index,
+                            "devotionalText",
+                            e.target.value,
+                          )
+                        }
+                        style={inputStyle}
+                      />
+                      <input
+                        required
+                        type="text"
+                        placeholder="Reflection Question"
+                        value={day.reflectionQuestion}
+                        onChange={(e) =>
+                          handleDayChange(
+                            index,
+                            "reflectionQuestion",
+                            e.target.value,
+                          )
+                        }
+                        style={inputStyle}
+                      />
+                      <input
+                        required
+                        type="text"
+                        placeholder="Verse Text (e.g., Do not be anxious...)"
+                        value={day.verse}
+                        onChange={(e) =>
+                          handleDayChange(index, "verse", e.target.value)
+                        }
+                        style={inputStyle}
+                      />
+                      <input
+                        required
+                        type="text"
+                        placeholder="Verse Reference (e.g., Philippians 4:6)"
+                        value={day.verseReference}
+                        onChange={(e) =>
+                          handleDayChange(
+                            index,
+                            "verseReference",
+                            e.target.value,
+                          )
+                        }
+                        style={inputStyle}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "10px",
+                    marginTop: "20px",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    style={cancelBtnStyle}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isCreating || isUpdating}
+                    style={submitBtnStyle}
+                  >
+                    {editId
+                      ? isUpdating
+                        ? "Updating..."
+                        : "Update Plan"
+                      : isCreating
+                        ? "Saving..."
+                        : "Create Plan"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+      {/* ================================================= */}
+      {/* MODAL: UPLOAD FEATURED IMAGE */}
+      {/* ================================================= */}
+      {isFeaturedModalOpen && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h2 style={{ marginTop: 0 }}>Mark as Featured</h2>
+            <p>Please upload a high-quality featured image for this plan.</p>
+
+            <div style={{ margin: "20px 0" }}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files?.[0]) setFeaturedFile(e.target.files[0]);
+                }}
+                style={inputStyle}
+              />
             </div>
-          </section>
-        </>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+              }}
+            >
+              <button
+                onClick={() => setIsFeaturedModalOpen(false)}
+                style={cancelBtnStyle}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleFeaturedSubmit}
+                style={submitBtnStyle}
+                disabled={isFeaturing} // Request ke dauran button disable ho jayega
+              >
+                {isFeaturing ? "Featuring..." : "Confirm & Feature"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );
+};
+
+// --- MODAL INLINE STYLES ---
+const modalOverlayStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0,0,0,0.6)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 9999,
+};
+const modalContentStyle: React.CSSProperties = {
+  backgroundColor: "#fff",
+  padding: "30px",
+  borderRadius: "12px",
+  width: "90%",
+  maxWidth: "600px",
+  maxHeight: "90vh",
+  overflowY: "auto",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+};
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "10px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+  marginTop: "5px",
+  boxSizing: "border-box",
+  fontFamily: "inherit",
+};
+const dayCardStyle: React.CSSProperties = {
+  backgroundColor: "#f9fafb",
+  padding: "15px",
+  borderRadius: "8px",
+  border: "1px solid #e5e7eb",
+  marginBottom: "15px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "8px",
+};
+const addBtnStyle: React.CSSProperties = {
+  backgroundColor: "#10b981",
+  color: "white",
+  padding: "6px 12px",
+  borderRadius: "6px",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "14px",
+};
+const cancelBtnStyle: React.CSSProperties = {
+  backgroundColor: "#f3f4f6",
+  color: "#374151",
+  padding: "10px 20px",
+  borderRadius: "6px",
+  border: "1px solid #d1d5db",
+  cursor: "pointer",
+  fontWeight: "bold",
+};
+const submitBtnStyle: React.CSSProperties = {
+  backgroundColor: "#4F46E5",
+  color: "white",
+  padding: "10px 20px",
+  borderRadius: "6px",
+  border: "none",
+  cursor: "pointer",
+  fontWeight: "bold",
 };
 
 export default BiblePlans;
