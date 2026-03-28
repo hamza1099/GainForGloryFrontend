@@ -466,7 +466,7 @@
 .m--modal-body {
   overflow-y: auto;
   padding: 1.5rem;
-  background-color: #f8fafc;
+  /* background-color: #f8fafc; */
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -705,7 +705,7 @@
   background-color: red;
   border: 1px solid transparent;
 }
-.m--btn-reject span{
+.m--btn-reject span {
   font-size: 14px;
   color: #fff;
 }
@@ -750,7 +750,7 @@
   background: #5a67a5; /* image jaisa bluish */
   color: #fff;
 }
-label{
+label {
   font-size: 15px;
   font-weight: 600;
 }
@@ -760,7 +760,9 @@ label{
   padding: 20px;
   text-align: center;
   cursor: pointer;
-  transition: border 0.3s, background-color 0.3s;
+  transition:
+    border 0.3s,
+    background-color 0.3s;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -776,10 +778,10 @@ label{
   font-size: 14px;
   pointer-events: none;
 }
-.m--drag-drop label{
+.m--drag-drop label {
   text-align: center !important;
 }
-.m--drag-drop span{
+.m--drag-drop span {
   color: #ea580c;
   font-size: 44px;
 }
@@ -978,20 +980,19 @@ label{
     transform: scale(1);
   }
 }
-.m--form-group label{
+.m--form-group label {
   text-align: left;
 }
 .default--modal .m--modal-body,
 .default--modal .m--modal-header,
-.default--modal .m--modal-footer{
+.default--modal .m--modal-footer {
   padding-left: 0px;
   padding-bottom: 0px;
 }
-.default--modal .m--modal-header
-{
+.default--modal .m--modal-header {
   padding-top: 0px;
 }
-.m--modal-body.pr-0{
+.m--modal-body.pr-0 {
   padding-right: 0px !important;
 }
 span.m--processed-text {
@@ -999,17 +1000,25 @@ span.m--processed-text {
   align-items: center;
   gap: 6px; /* space between icon and text */
   padding: 6px 12px;
-  font-size: 0.875rem; /* modern, slightly smaller text */
+  font-size: 13px; /* modern, slightly smaller text */
   font-weight: 500;
   color: #1f2937; /* dark gray text */
   background-color: #f0fdf4; /* soft green background */
   border: 1px solid #34d399; /* subtle green border */
   border-radius: 8px; /* smooth rounded corners */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* soft shadow for depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* soft shadow for depth */
   cursor: default; /* non-clickable style */
   transition: all 0.2s ease-in-out;
 }
-
+.m--processed-text.rejected-text {
+  background-color: red; /* soft green background */
+  border: 1px solid red; /* subtle green border */
+  color: #fff;
+}
+.m--processed-text.rejected-text:hover {
+  background-color: red;
+  color: #fff;
+}
 span.m--processed-text .material-symbols-outlined {
   color: #10b981; /* green icon */
   font-size: 1rem;
@@ -1018,5 +1027,36 @@ span.m--processed-text .material-symbols-outlined {
 /* optional hover effect */
 span.m--processed-text:hover {
   background-color: #d1fae5; /* slightly darker green on hover */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.m--modal-overlay.edit--life--group--modal .m--modal-body,
+.m--modal-overlay.edit--life--group--modal .m--modal-header {
+  padding: 0px !important;
+}
+.m--modal-overlay.edit--life--group--modal .m--modal-header {
+  margin-bottom: 20px;
+}
+.m--modal-overlay.edit--life--group--modal .m--modal-footer {
+  padding-bottom: 0px;
+}
+.application--detail--modal .m--modal-header {
+  padding: 0px !important;
+}
+.application--detail--modal .m--modal-footer {
+  padding-bottom: 0px;
+}
+.application--detail--modal .m--form-label {
+  font-size: 14px;
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.close--btn {
+  background-color: rgb(243, 244, 246);
+  color: rgb(55, 65, 81);
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: 1px solid rgb(209, 213, 219);
+  cursor: pointer;
+  font-weight: bold;
 }

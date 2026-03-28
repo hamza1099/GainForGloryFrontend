@@ -485,9 +485,15 @@ const LifeGroup = () => {
                                       </button>
                                     </div>
                                   ) : (
-                                    <span className="m--processed-text">
+                                    <span
+                                      className={
+                                        request.status === "ACTIVE"
+                                          ? "m--processed-text accepted-text"
+                                          : "m--processed-text rejected-text"
+                                      }
+                                    >
                                       {request.status === "ACTIVE"
-                                        ? "ACCEPTED "
+                                        ? "ACCEPTED"
                                         : "REJECTED"}
                                     </span>
                                   )}
@@ -694,9 +700,9 @@ const LifeGroup = () => {
 
       {/* --- ✅ EDIT LIFE GROUP MODAL --- */}
       {isEditModalOpen && (
-        <div className="m--modal-overlay">
+        <div className="m--modal-overlay edit--life--group--modal">
           <div className="m--modal-container">
-            <div className="m--modal-header">
+            <div className="m--modal-header p-0">
               <h2>Edit Life Group</h2>
               <button
                 onClick={() => {

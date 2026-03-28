@@ -24,6 +24,7 @@ const DeleteConfirmModal: React.FC<Props> = ({
   return (
     <div className="m--modal-overlay">
       <div className="m--modal">
+        <div style={{ fontSize: "40px", marginBottom: "10px" }}>⚠️</div>
         <h3>{title}</h3>
         <p>{message}</p>
 

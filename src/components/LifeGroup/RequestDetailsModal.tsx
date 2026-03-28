@@ -27,7 +27,7 @@ export const RequestDetailsModal = ({
   };
 
   return (
-    <div className="m--modal-overlay">
+    <div className="m--modal-overlay application--detail--modal">
       <div className="m--modal-container" style={{ maxWidth: "700px" }}>
         <div className="m--modal-header">
           <h2>Application Details</h2>
@@ -137,7 +137,7 @@ export const RequestDetailsModal = ({
         </div>
 
         <div className="m--modal-footer">
-          <button className="m--btn-secondary" onClick={onClose}>
+          <button className="close--btn" onClick={onClose}>
             Close
           </button>
         </div>
