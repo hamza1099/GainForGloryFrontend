@@ -389,8 +389,11 @@ const BiblePlans: React.FC = () => {
           </div>
 
           {isLoadingPlans ? (
-            <p className="errorbox">Loading plans...</p>
+            <div className="main--loader">
+              <div className="loader"></div>
+            </div>
           ) : (
+            // <p className="errorbox">Loading plans...</p>
             <div className="hm--plans-grid">
               {allPlans.length > 0 ? (
                 allPlans.map((plan) => (
@@ -499,7 +502,9 @@ const BiblePlans: React.FC = () => {
               Add New Bible Plan
             </h2>
             {isSingleLoading && editId ? (
-              <p className="errorbox mt-5">Loading plan details...</p>
+              <div className="main--loader small">
+                <div className="loader"></div>
+              </div>
             ) : (
               <form
                 onSubmit={handleFormSubmit}

@@ -296,7 +296,9 @@ const LifeGroup = () => {
                       {groupsLoading ? (
                         <tr>
                           <td colSpan={6} className="errorbox">
-                            Loading groups...
+                            <div className="main--loader">
+                              <div className="loader"></div>
+                            </div>
                           </td>
                         </tr>
                       ) : (
@@ -396,7 +398,9 @@ const LifeGroup = () => {
                           {membersLoading ? (
                             <tr>
                               <td colSpan={6} className="errorbox">
-                                Loading requests...
+                                <div className="main--loader">
+                                  <div className="loader"></div>
+                                </div>
                               </td>
                             </tr>
                           ) : joinRequests.length === 0 ? (

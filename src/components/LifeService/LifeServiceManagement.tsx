@@ -241,7 +241,9 @@ const LifeServiceManagement = () => {
                 {isLoading ? (
                   <tr>
                     <td colSpan={4} className="text-center">
-                      Loading services...
+                      <div className="main--loader">
+                        <div className="loader"></div>
+                      </div>
                     </td>
                   </tr>
                 ) : liveServices.length === 0 ? (

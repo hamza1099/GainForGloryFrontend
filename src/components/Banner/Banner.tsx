@@ -95,8 +95,16 @@ const Banner = () => {
         <div className="m--header mb-3">
           <h1 className="m--title">Banner Management</h1>
         </div>
-        {isLoading && <div className="m--loading">Loading banners...</div>}
-        {isError && <div className="m--error">Error loading banners.</div>}
+        {isLoading && (
+          <div className="main--loader">
+            <div className="loader"></div>
+          </div>
+        )}
+        {isError && (
+          <div className="main--loader">
+            <div className="loader"></div>
+          </div>
+        )}
 
         <div className="m--grid">
           {/* Loading & Error States */}
