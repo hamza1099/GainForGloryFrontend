@@ -14,7 +14,7 @@ import "../../Style/LifeGroupsManagement.css";
 
 const LifeServiceManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const limit = 10;
+  const limit = 1;
 
   // API Hooks
   const {
@@ -40,6 +40,65 @@ const LifeServiceManagement = () => {
     videoUrl: "",
     startsAt: "",
   });
+  const [errors, setErrors] = useState({
+    title: "",
+    videoUrl: "",
+    startsAt: "",
+  });
+
+  const resetForm = () => {
+    setFormState({
+      title: "",
+      videoUrl: "",
+      startsAt: "",
+    });
+
+    setErrors({
+      title: "",
+      videoUrl: "",
+      startsAt: "",
+    });
+
+    setEditData(null);
+  };
+  const validate = () => {
+    let newErrors = {
+      title: "",
+      videoUrl: "",
+      startsAt: "",
+    };
+
+    let isValid = true;
+
+    if (!formState.title.trim()) {
+      newErrors.title = "Title is required";
+      isValid = false;
+    }
+
+    if (!formState.videoUrl.trim()) {
+      newErrors.videoUrl = "Video URL is required";
+      isValid = false;
+    } else if (!/^https?:\/\/.+/.test(formState.videoUrl)) {
+      newErrors.videoUrl = "Enter a valid URL";
+      isValid = false;
+    }
+
+    if (!formState.startsAt) {
+      newErrors.startsAt = "Start date is required";
+      isValid = false;
+    } else {
+      const selectedDate = new Date(formState.startsAt);
+      const now = new Date();
+
+      if (selectedDate < now) {
+        newErrors.startsAt = "Past date not allowed";
+        isValid = false;
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const liveServices = servicesData?.data || [];
   const meta = servicesData?.meta;
@@ -57,15 +116,16 @@ const LifeServiceManagement = () => {
   }, [editData]);
 
   const handleSubmit = async () => {
-    if (!formState.title || !formState.videoUrl || !formState.startsAt) {
-      return toast.warn("Please fill all required fields!");
-    }
-    const selectedDate = new Date(formState.startsAt);
-    const now = new Date();
+    if (!validate()) return;
+    // if (!formState.title || !formState.videoUrl || !formState.startsAt) {
+    //   return toast.warn("Please fill all required fields!");
+    // }
+    // const selectedDate = new Date(formState.startsAt);
+    // const now = new Date();
 
-    if (selectedDate < now) {
-      return toast.error("Past date and time are not allowed!");
-    }
+    // if (selectedDate < now) {
+    //   return toast.error("Past date and time are not allowed!");
+    // }
     try {
       const payload = {
         ...formState,
@@ -111,6 +171,11 @@ const LifeServiceManagement = () => {
         console.error(err);
       }
     }
+  };
+
+  const handleCloseModal = () => {
+    resetForm();
+    setIsModalOpen(false);
   };
 
   return (
@@ -200,7 +265,7 @@ const LifeServiceManagement = () => {
           </div>
 
           {/* Pagination */}
-          {meta && meta.totalPage > 1 && (
+          {meta && meta.totalPages > 1 && (
             <div className="m--pagination">
               <button
                 className="m--pagination-prev"
@@ -230,7 +295,7 @@ const LifeServiceManagement = () => {
           <div className="m--modal-container">
             <div className="m--modal-header">
               <h2>{editData ? "Edit" : "Add"} Live Service</h2>
-              <button onClick={() => setIsModalOpen(false)}>✕</button>
+              <button onClick={handleCloseModal}>✕</button>
             </div>
             <div className="m--modal-body">
               <div className="m--form-group">
@@ -244,6 +309,7 @@ const LifeServiceManagement = () => {
                     setFormState({ ...formState, title: e.target.value })
                   }
                 />
+                {errors.title && <p className="m--error">{errors.title}</p>}
               </div>
               <div className="m--form-group">
                 <label>Video URL</label>
@@ -256,6 +322,9 @@ const LifeServiceManagement = () => {
                     setFormState({ ...formState, videoUrl: e.target.value })
                   }
                 />
+                {errors.videoUrl && (
+                  <p className="m--error">{errors.videoUrl}</p>
+                )}
               </div>
               <div className="m--form-group">
                 <label>Start Date & Time</label>
@@ -268,11 +337,14 @@ const LifeServiceManagement = () => {
                     setFormState({ ...formState, startsAt: e.target.value })
                   }
                 />
+                {errors.startsAt && (
+                  <p className="m--error">{errors.startsAt}</p>
+                )}
               </div>
             </div>
             <div className="m--modal-footer">
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={handleCloseModal}
                 disabled={isCreating || isUpdating}
               >
                 Cancel

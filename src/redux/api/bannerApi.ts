@@ -8,7 +8,7 @@ const BannerApi = baseApi.injectEndpoints({
     // ==============================
     getAllBanners: build.query({
       query: () => ({
-        url: "/banner",
+        url: "/banner/all",
         method: "GET",
       }),
       providesTags: ["banner"],

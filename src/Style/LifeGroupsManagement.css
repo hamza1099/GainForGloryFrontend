@@ -10,6 +10,12 @@
   border: 0 solid #e2e8f0;
 }
 
+.m--error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 .m--container {
   display: block;
   width: 100%;
