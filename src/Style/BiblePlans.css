@@ -1122,3 +1122,102 @@
   padding: 6px 15px;
   border-radius: 8px;
 }
+/* Overlay covering the whole screen */
+.dbp--modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal container */
+.dbp--modal {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  animation: dbp--fade-in 0.2s ease-out;
+  text-align: center;
+}
+
+/* Fade-in animation for modal */
+@keyframes dbp--fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal title */
+.dbp--modal h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Modal message text */
+.dbp--modal p {
+  margin: 0 0 20px 0;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Buttons container */
+.dbp--modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Cancel button style */
+.dbp--btn-cancel {
+  background-color: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+
+.dbp--btn-cancel:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+/* Delete button style */
+.dbp--btn-delete {
+  background-color: #e53e3e; /* red */
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+
+.dbp--btn-delete:hover:not(:disabled) {
+  background-color: #c53030; /* darker red */
+}
+
+/* Disabled buttons style */
+.dbp--btn-cancel:disabled,
+.dbp--btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

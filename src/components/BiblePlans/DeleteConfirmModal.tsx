@@ -22,14 +22,15 @@ const DeleteConfirmModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="m--modal-overlay">
-      <div className="m--modal">
+    <div className="dbp--modal-overlay">
+      <div className="dbp--modal">
+        <div style={{ fontSize: "40px", marginBottom: "10px" }}>⚠️</div>
         <h3>{title}</h3>
         <p>{message}</p>
 
-        <div className="m--modal-actions">
+        <div className="dbp--modal-actions">
           <button
-            className="m--btn-cancel"
+            className="dbp--btn-cancel"
             onClick={onClose}
             disabled={loading}
           >
@@ -37,7 +38,7 @@ const DeleteConfirmModal: React.FC<Props> = ({
           </button>
 
           <button
-            className="m--btn-delete"
+            className="dbp--btn-delete"
             onClick={onConfirm}
             disabled={loading}
           >

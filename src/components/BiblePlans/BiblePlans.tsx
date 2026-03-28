@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, FormEvent, useEffect, useRef } from "react";
 import "../../Style/BiblePlans.css"; // Import the separate CSS file
-
+import DeleteConfirmModal from "./DeleteConfirmModal";
 // TODO: Update this import path to match where your API slice is exported
 import {
   useGetBiblePlansQuery,
@@ -69,6 +69,8 @@ const BiblePlans: React.FC = () => {
   const [deleteBiblePlan, { isLoading: isDeleting }] =
     useDeleteBiblePlanMutation();
   const [deletingPlanId, setDeletingPlanId] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [planToDelete, setPlanToDelete] = useState<string | null>(null);
   const [updateFeaturedBiblePlan, { isLoading: isFeaturing }] =
     useUpdateFeaturedBiblePlanMutation();
 
@@ -283,13 +285,8 @@ const BiblePlans: React.FC = () => {
   };
 
   const handleDelete = async (planId: string) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this Bible Plan?",
-    );
-    if (!confirmDelete) return;
-
     try {
-      setDeletingPlanId(planId); // Start loading for this specific plan
+      setDeletingPlanId(planId); // Start loading
       await deleteBiblePlan(planId).unwrap();
       toast.success("Bible Plan deleted successfully!");
     } catch (error) {
@@ -297,6 +294,8 @@ const BiblePlans: React.FC = () => {
       toast.error("Failed to delete plan.");
     } finally {
       setDeletingPlanId(null); // Reset loading state
+      setIsDeleteModalOpen(false);
+      setPlanToDelete(null);
     }
   };
 
@@ -448,16 +447,17 @@ const BiblePlans: React.FC = () => {
                         </button> */}
                         <button
                           className="hm--delete-button"
-                          onClick={() => handleDelete(plan.id)}
+                          onClick={() => {
+                            setPlanToDelete(plan.id);
+                            setIsDeleteModalOpen(true);
+                          }}
                           disabled={deletingPlanId === plan.id}
                         >
                           {deletingPlanId === plan.id ? (
-                            // Icon shown while deleting
                             <span className="material-symbols-outlined">
                               hourglass_top
                             </span>
                           ) : (
-                            // Normal delete icon
                             <span className="material-symbols-outlined">
                               delete
                             </span>
@@ -598,7 +598,7 @@ const BiblePlans: React.FC = () => {
                       cursor: "pointer",
                       display: "block",
                       marginTop: "10px",
-                      fontWeight:"700"
+                      fontWeight: "700",
                     }}
                   >
                     Logo File (Drag & Drop or Click)
@@ -735,7 +735,7 @@ const BiblePlans: React.FC = () => {
                     type="submit"
                     disabled={isCreating || isUpdating}
                     className="default--btn"
-                    >
+                  >
                     {editId
                       ? isUpdating
                         ? "Updating..."
@@ -844,6 +844,15 @@ const BiblePlans: React.FC = () => {
           </div>
         </div>
       )}
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (planToDelete) handleDelete(planToDelete);
+        }}
+        title="Delete Bible Plan"
+        message="Are you sure you want to delete this Bible Plan?"
+      />
     </main>
   );
 };

@@ -251,7 +251,8 @@ const Banner = () => {
                 <label className="m--form-label">Start Date</label>
                 <input
                   type="date"
-                  className="m--input"
+                  className="m--form-input"
+                  // className="m--input "
                   value={startDate}
                   onChange={(e) => {
                     setStartDate(e.target.value);
@@ -269,7 +270,8 @@ const Banner = () => {
                 <label className="m--form-label">End Date</label>
                 <input
                   type="date"
-                  className="m--input"
+                  className="m--form-input"
+                  // className="m--input"
                   value={endDate}
                   onChange={(e) => {
                     setEndDate(e.target.value);

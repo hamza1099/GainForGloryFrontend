@@ -442,7 +442,7 @@ const LifeGroup = () => {
                                     <span className="material-symbols-outlined">
                                       visibility
                                     </span>
-                                    View <br /> Details
+                                    {/* View <br /> Detailss */}
                                   </button>
                                   {request.status === "PENDING" ? (
                                     <div
@@ -621,49 +621,6 @@ const LifeGroup = () => {
                 <label>Logo File</label>
                 <input type="file" onChange={handleFileChange} />
               </div> */}
-              <div
-                className={`m--form-group m--drag-drop ${isDragging ? "drag-over" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setIsDragging(true);
-                }}
-                onDragLeave={(e) => {
-                  e.preventDefault();
-                  setIsDragging(false);
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setIsDragging(false);
-                  const droppedFile = e.dataTransfer.files[0];
-                  if (!droppedFile) return;
-                  if (!droppedFile.type.startsWith("image/")) {
-                    setErrorMsg("Only image files are allowed");
-                    return;
-                  }
-                  if (droppedFile.size > 2 * 1024 * 1024) {
-                    setErrorMsg("File size must be less than 2MB");
-                    return;
-                  }
-                  setFile(droppedFile);
-                  setErrorMsg(null);
-                }}
-              >
-                <span className="material-symbols-outlined">cloud_upload</span>
-                <label style={{ cursor: "pointer", textAlign:"center" }}>
-                  Logo File (Drag & Drop or Click)
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    style={{ display: "none" }}
-                  />
-                  <div className="drag-drop-text">
-                    {file
-                      ? file.name
-                      : "Drag and drop an image here, or click to select"}
-                  </div>
-                </label>
-              </div>
               {/* Banner File (Optional) */}
               <div
                 className={`m--form-group m--drag-drop ${isDragging ? "drag-over" : ""}`}
