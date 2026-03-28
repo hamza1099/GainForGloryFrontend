@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -15,7 +13,6 @@ import {
 import { skipToken } from "@reduxjs/toolkit/query";
 import { RequestDetailsModal } from "./RequestDetailsModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
-
 
 type TabType = "groups" | "requests";
 
@@ -36,6 +33,7 @@ const LifeGroup = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [deleteId, setDeleteId] = useState<string | number | null>(null);
   const {
     data: groupsData,
@@ -158,18 +156,18 @@ const LifeGroup = () => {
     }
   };
 
- const handleDeleteGroup = async () => {
-   if (!deleteId) return;
+  const handleDeleteGroup = async () => {
+    if (!deleteId) return;
 
-   try {
-     await deleteLifeGroup(deleteId).unwrap();
-     refetchGroups();
-     setShowDeleteModal(false);
-     setDeleteId(null);
-   } catch (err: any) {
-     setErrorMsg(err?.data?.message || "Delete failed");
-   }
- };
+    try {
+      await deleteLifeGroup(String(deleteId)).unwrap();
+      refetchGroups();
+      setShowDeleteModal(false);
+      setDeleteId(null);
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || "Delete failed");
+    }
+  };
 
   const handleAddSubmit = async () => {
     try {
@@ -182,12 +180,14 @@ const LifeGroup = () => {
       formData.append("title", formState.title);
       formData.append("description", formState.description);
       formData.append("logo", file);
+      if (bannerFile) formData.append("lifeBanner", bannerFile);
 
       await createLifeGroup(formData).unwrap();
 
       setIsAddModalOpen(false);
       setFormState({ title: "", description: "" });
       setFile(null);
+      setBannerFile(null);
       refetchGroups();
     } catch (err: any) {
       setErrorMsg(err?.data?.message || err.message || "Failed to create");
@@ -209,6 +209,7 @@ const LifeGroup = () => {
       formData.append("title", formState.title);
       formData.append("description", formState.description);
       if (file) formData.append("logo", file);
+      if (bannerFile) formData.append("lifeBanner", bannerFile);
 
       await updateLifeGroup({
         id: editGroupData.id,
@@ -218,6 +219,7 @@ const LifeGroup = () => {
       setIsEditModalOpen(false);
       setEditGroupData(null);
       setFile(null);
+      setBannerFile(null);
       refetchGroups();
     } catch (err: any) {
       setErrorMsg(err?.data?.message || err.message);
@@ -658,6 +660,62 @@ const LifeGroup = () => {
                   <div className="drag-drop-text">
                     {file
                       ? file.name
+                      : "Drag and drop an image here, or click to select"}
+                  </div>
+                </label>
+              </div>
+              {/* Banner File (Optional) */}
+              <div
+                className={`m--form-group m--drag-drop ${isDragging ? "drag-over" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  const droppedFile = e.dataTransfer.files[0];
+                  if (!droppedFile) return;
+                  if (!droppedFile.type.startsWith("image/")) {
+                    setErrorMsg("Only image files are allowed");
+                    return;
+                  }
+                  if (droppedFile.size > 2 * 1024 * 1024) {
+                    setErrorMsg("File size must be less than 2MB");
+                    return;
+                  }
+                  setBannerFile(droppedFile);
+                  setErrorMsg(null);
+                }}
+              >
+                <span className="material-symbols-outlined">cloud_upload</span>
+                <label style={{ cursor: "pointer" }}>
+                  Banner File (Optional)
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (!file.type.startsWith("image/")) {
+                        setErrorMsg("Only image files are allowed");
+                        return;
+                      }
+                      if (file.size > 2 * 1024 * 1024) {
+                        setErrorMsg("File size must be less than 2MB");
+                        return;
+                      }
+                      setBannerFile(file);
+                      setErrorMsg(null);
+                    }}
+                    style={{ display: "none" }}
+                  />
+                  <div className="drag-drop-text">
+                    {bannerFile
+                      ? bannerFile.name
                       : "Drag and drop an image here, or click to select"}
                   </div>
                 </label>
