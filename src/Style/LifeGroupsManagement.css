@@ -1,14 +1,6 @@
 /* LifeGroupsManagement.css - Light Mode Only */
 
 /* RESET / BASE */
-.m--container *,
-.m--container *::before,
-.m--container *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  border: 0 solid #e2e8f0;
-}
 
 .m--error {
   color: red;

@@ -92,7 +92,7 @@ const Banner = () => {
   return (
     <div className="m--container">
       <main className="m--main">
-        <div className="m--header">
+        <div className="m--header mb-3">
           <h1 className="m--title">Banner Management</h1>
         </div>
         {isLoading && <div className="m--loading">Loading banners...</div>}
