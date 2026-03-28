@@ -39,11 +39,13 @@ const LifeServiceManagement = () => {
     title: "",
     videoUrl: "",
     startsAt: "",
+    endsAt: "",
   });
   const [errors, setErrors] = useState({
     title: "",
     videoUrl: "",
     startsAt: "",
+    endsAt: "",
   });
 
   const resetForm = () => {
@@ -51,12 +53,14 @@ const LifeServiceManagement = () => {
       title: "",
       videoUrl: "",
       startsAt: "",
+      endsAt: "",
     });
 
     setErrors({
       title: "",
       videoUrl: "",
       startsAt: "",
+      endsAt: "",
     });
 
     setEditData(null);
@@ -66,6 +70,7 @@ const LifeServiceManagement = () => {
       title: "",
       videoUrl: "",
       startsAt: "",
+      endsAt: "",
     };
 
     let isValid = true;
@@ -95,6 +100,18 @@ const LifeServiceManagement = () => {
         isValid = false;
       }
     }
+    if (!formState.endsAt) {
+      newErrors.endsAt = "End date is required";
+      isValid = false;
+    } else {
+      const endDate = new Date(formState.endsAt);
+      const startDate = new Date(formState.startsAt);
+
+      if (endDate <= startDate) {
+        newErrors.endsAt = "End date must be after start date";
+        isValid = false;
+      }
+    }
 
     setErrors(newErrors);
     return isValid;
@@ -109,9 +126,10 @@ const LifeServiceManagement = () => {
         title: editData.title,
         videoUrl: editData.videoUrl,
         startsAt: moment(editData.startsAt).format("YYYY-MM-DDTHH:mm"),
+        endsAt: moment(editData.endsAt).format("YYYY-MM-DDTHH:mm"),
       });
     } else {
-      setFormState({ title: "", videoUrl: "", startsAt: "" });
+      setFormState({ title: "", videoUrl: "", startsAt: "", endsAt: "" });
     }
   }, [editData]);
 
@@ -130,6 +148,7 @@ const LifeServiceManagement = () => {
       const payload = {
         ...formState,
         startsAt: new Date(formState.startsAt).toISOString(),
+        endsAt: new Date(formState.endsAt).toISOString(),
       };
 
       if (editData) {
@@ -340,6 +359,19 @@ const LifeServiceManagement = () => {
                 {errors.startsAt && (
                   <p className="m--error">{errors.startsAt}</p>
                 )}
+              </div>
+              <div className="m--form-group">
+                <label>End Date & Time</label>
+                <input
+                  type="datetime-local"
+                  className="m--form-input"
+                  disabled={isCreating || isUpdating}
+                  value={formState.endsAt}
+                  onChange={(e) =>
+                    setFormState({ ...formState, endsAt: e.target.value })
+                  }
+                />
+                {errors.endsAt && <p className="m--error">{errors.endsAt}</p>}
               </div>
             </div>
             <div className="m--modal-footer">
