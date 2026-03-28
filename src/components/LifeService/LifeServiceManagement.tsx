@@ -11,6 +11,7 @@ import moment from "moment";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // CSS import zaroori hai
 import "../../Style/LifeGroupsManagement.css";
+import DeleteConfirmModal from "./DeleteConfirmModal"
 
 const LifeServiceManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +36,8 @@ const LifeServiceManagement = () => {
   // Modal & Form States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState<any>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [formState, setFormState] = useState({
     title: "",
     videoUrl: "",
@@ -158,18 +161,21 @@ const LifeServiceManagement = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this service?")) {
-      try {
-        await toast.promise(deleteLiveService(id).unwrap(), {
-          pending: "Deleting...",
-          success: "Service deleted!",
-          error: "Delete failed!",
-        });
-        refetch();
-      } catch (err) {
-        console.error(err);
-      }
+  const handleDelete = async () => {
+    if (!selectedId) return;
+
+    try {
+      await toast.promise(deleteLiveService(selectedId).unwrap(), {
+        pending: "Deleting...",
+        success: "Service deleted!",
+        error: "Delete failed!",
+      });
+
+      setIsDeleteModalOpen(false);
+      setSelectedId(null);
+      refetch();
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -252,7 +258,10 @@ const LifeServiceManagement = () => {
                         </button>
                         <button
                           className="m--btn-delete"
-                          onClick={() => handleDelete(service.id)}
+                          onClick={() => {
+                            setSelectedId(service.id);
+                            setIsDeleteModalOpen(true);
+                          }}
                         >
                           Delete
                         </button>
@@ -272,17 +281,20 @@ const LifeServiceManagement = () => {
                 disabled={currentPage === 1 || isFetching}
                 onClick={() => setCurrentPage((p) => p - 1)}
               >
-                Prev
+                <span className="material-symbols-outlined">chevron_left</span>
               </button>
+
+              {/* Only show current page number */}
               <span className="m--page-indicator">
-                Page <strong>{currentPage}</strong> of {meta.totalPage}
+                <strong>{currentPage}</strong>
               </span>
+
               <button
                 className="m--pagination-next"
-                disabled={currentPage >= meta.totalPage || isFetching}
+                disabled={currentPage >= meta.totalPages || isFetching}
                 onClick={() => setCurrentPage((p) => p + 1)}
               >
-                Next
+                <span className="material-symbols-outlined">chevron_right</span>
               </button>
             </div>
           )}
@@ -291,9 +303,9 @@ const LifeServiceManagement = () => {
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="m--modal-overlay">
+        <div className="m--modal-overlay default--modal">
           <div className="m--modal-container">
-            <div className="m--modal-header">
+            <div className="m--modal-header p-0">
               <h2>{editData ? "Edit" : "Add"} Live Service</h2>
               <button onClick={handleCloseModal}>✕</button>
             </div>
@@ -364,6 +376,14 @@ const LifeServiceManagement = () => {
           </div>
         </div>
       )}
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedId(null);
+        }}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 };

@@ -375,7 +375,7 @@ const BiblePlans: React.FC = () => {
               <button
                 onClick={() => setIsModalOpen(true)}
                 style={{
-                  backgroundColor: "#4F46E5",
+                  backgroundColor: "#f97316",
                   color: "white",
                   padding: "8px 16px",
                   borderRadius: "6px",
@@ -432,16 +432,36 @@ const BiblePlans: React.FC = () => {
                           <span className="material-symbols-outlined">
                             edit
                           </span>
-                          edit plan
+                          {/* edit plan */}
                         </button>
+                        {/* <button
+                          className="hm--delete-button"
+                          onClick={() => handleDelete(plan.id)}
+                          disabled={deletingPlanId === plan.id}
+                        >
+                          <span className="material-symbols-outlined">
+                            delete
+                          </span>
+                          {deletingPlanId === plan.id
+                            ? "Deleting..."
+                            : "Delete"}
+                        </button> */}
                         <button
                           className="hm--delete-button"
                           onClick={() => handleDelete(plan.id)}
                           disabled={deletingPlanId === plan.id}
                         >
-                          {deletingPlanId === plan.id
-                            ? "Deleting..."
-                            : "Delete"}
+                          {deletingPlanId === plan.id ? (
+                            // Icon shown while deleting
+                            <span className="material-symbols-outlined">
+                              hourglass_top
+                            </span>
+                          ) : (
+                            // Normal delete icon
+                            <span className="material-symbols-outlined">
+                              delete
+                            </span>
+                          )}
                         </button>
                       </div>
                     </div>
@@ -508,7 +528,7 @@ const BiblePlans: React.FC = () => {
                   style={inputStyle}
                 />
 
-                <div>
+                {/* <div>
                   <label
                     style={{
                       fontSize: "14px",
@@ -525,6 +545,75 @@ const BiblePlans: React.FC = () => {
                     onChange={handleFileChange}
                     style={inputStyle}
                   />
+                </div> */}
+
+                <div
+                  className={`m--form-group m--drag-drop ${isDragging ? "drag-over" : ""}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    const droppedFile = e.dataTransfer.files[0];
+                    if (!droppedFile) return;
+                    if (!droppedFile.type.startsWith("image/")) {
+                      toast.warning("Only image files are allowed");
+                      return;
+                    }
+                    if (droppedFile.size > 2 * 1024 * 1024) {
+                      toast.warning("File size must be less than 2MB");
+                      return;
+                    }
+                    setFormData({ ...formData, imageFile: droppedFile });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "30px",
+                    borderRadius: "8px",
+                    border: isDragging
+                      ? "2px dashed rgb(249, 115, 22)"
+                      : "2px dashed rgb(249, 115, 22)",
+                    backgroundColor: "#f9fafb",
+                    color: "#374151",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    transition: "border-color 0.3s",
+                    marginTop: "5px",
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: "36px", color: "rgb(249, 115, 22)" }}
+                  >
+                    cloud_upload
+                  </span>
+                  <label
+                    style={{
+                      cursor: "pointer",
+                      display: "block",
+                      marginTop: "10px",
+                      fontWeight:"700"
+                    }}
+                  >
+                    Logo File (Drag & Drop or Click)
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </label>
+                  <div className="drag-drop-text" style={{ marginTop: "5px" }}>
+                    {formData.imageFile
+                      ? formData.imageFile.name
+                      : "Drag and drop an image here, or click to select"}
+                  </div>
                 </div>
 
                 <hr
@@ -545,7 +634,7 @@ const BiblePlans: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleAddDay}
-                    style={addBtnStyle}
+                    className="default--btn"
                   >
                     + Add Day
                   </button>
@@ -645,8 +734,8 @@ const BiblePlans: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isCreating || isUpdating}
-                    style={submitBtnStyle}
-                  >
+                    className="default--btn"
+                    >
                     {editId
                       ? isUpdating
                         ? "Updating..."
@@ -699,8 +788,8 @@ const BiblePlans: React.FC = () => {
                 padding: "30px",
                 borderRadius: "8px",
                 border: isDragging
-                  ? "2px dashed #1D4ED8"
-                  : "2px dashed #4F46E5",
+                  ? "2px dashed #rgb(249, 115, 22)"
+                  : "2px dashed rgb(249, 115, 22)",
                 backgroundColor: "#f9fafb",
                 color: "#374151",
                 textAlign: "center",
@@ -711,7 +800,7 @@ const BiblePlans: React.FC = () => {
             >
               <span
                 className="material-symbols-outlined"
-                style={{ fontSize: "36px", color: "#4F46E5" }}
+                style={{ fontSize: "36px", color: "rgb(249, 115, 22)" }}
               >
                 cloud_upload
               </span>
@@ -746,7 +835,7 @@ const BiblePlans: React.FC = () => {
               </button>
               <button
                 onClick={handleFeaturedSubmit}
-                style={submitBtnStyle}
+                className="default--btn"
                 disabled={isFeaturing} // Request ke dauran button disable ho jayega
               >
                 {isFeaturing ? "Featuring..." : "Confirm & Feature"}

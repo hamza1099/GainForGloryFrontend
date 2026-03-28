@@ -589,12 +589,12 @@ const LifeGroup = () => {
       {/* --- ✅ ADD LIFE GROUP MODAL --- */}
       {isAddModalOpen && (
         <div className="m--modal-overlay">
-          <div className="m--modal-container">
+          <div className="m--modal-container default--modal">
             <div className="m--modal-header">
               <h2>Add Life Group</h2>
               <button onClick={() => setIsAddModalOpen(false)}>✕</button>
             </div>
-            <div className="m--modal-body">
+            <div className="m--modal-body pr-0">
               {errorMsg && <p className="m--error-text">{errorMsg}</p>}
               <div className="m--form-group">
                 <label>Title</label>
@@ -647,7 +647,7 @@ const LifeGroup = () => {
                 }}
               >
                 <span className="material-symbols-outlined">cloud_upload</span>
-                <label style={{ cursor: "pointer" }}>
+                <label style={{ cursor: "pointer", textAlign:"center" }}>
                   Logo File (Drag & Drop or Click)
                   <input
                     type="file"
