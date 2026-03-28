@@ -407,7 +407,10 @@ const BiblePlans: React.FC = () => {
                         <input
                           type="checkbox"
                           checked={plan.isFeatured}
-                          onChange={() => handleToggleFeatured(plan.id)}
+                          onChange={(e) => {
+                            e.preventDefault(); // ❗ stop default toggle
+                            handleToggleFeatured(plan.id);
+                          }}
                           className="custom-checkbox"
                         />
                         <span className="slider round"></span>
