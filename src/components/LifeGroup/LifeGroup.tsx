@@ -149,7 +149,7 @@ const LifeGroup = () => {
 
   const handleRejectRequest = async (memberId: string) => {
     try {
-      await updateMemberStatus({ memberId, status: "REJECTED" }).unwrap();
+      await updateMemberStatus({ memberId, status: "BLOCKED" }).unwrap();
       refetchMembers();
     } catch (err: any) {
       setErrorMsg(err?.data?.message || "Reject failed");
@@ -487,8 +487,8 @@ const LifeGroup = () => {
                                   ) : (
                                     <span className="m--processed-text">
                                       {request.status === "ACTIVE"
-                                        ? "Accepted ✅"
-                                        : "Declined ❌"}
+                                        ? "ACCEPTED "
+                                        : "REJECTED"}
                                     </span>
                                   )}
                                 </td>
