@@ -989,6 +989,9 @@ label {
   padding-left: 0px;
   padding-bottom: 0px;
 }
+.m--modal-overlay.default--modal.edit--life--service--modal .m--modal-body{
+  padding-right: 0px;
+}
 .default--modal .m--modal-header {
   padding-top: 0px;
 }

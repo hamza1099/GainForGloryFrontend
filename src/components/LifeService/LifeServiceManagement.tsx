@@ -322,7 +322,7 @@ const LifeServiceManagement = () => {
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="m--modal-overlay default--modal">
+        <div className="m--modal-overlay default--modal edit--life--service--modal">
           <div className="m--modal-container">
             <div className="m--modal-header p-0">
               <h2>{editData ? "Edit" : "Add"} Live Service</h2>
