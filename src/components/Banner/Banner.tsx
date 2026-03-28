@@ -16,6 +16,7 @@ const Banner = () => {
   const [dragOver, setDragOver] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string | number | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   // RTK Query Hooks
   const { data: banners, isLoading, isError } = useGetAllBannersQuery({});
   const [createBanner, { isLoading: isCreating }] = useCreateBannerMutation();
@@ -130,6 +131,8 @@ const Banner = () => {
                   alt="Banner"
                   className="m--card-img"
                   src={banner.image || banner.url}
+                  onClick={() => setPreviewImage(banner.image || banner.url)}
+                  style={{ cursor: "pointer" }}
                 />
               </div>
               <div className="m--card-content">
@@ -303,7 +306,39 @@ const Banner = () => {
           </div>
         </div>
       )}
+      {previewImage && (
+        <div className="m--modal-overlay">
+          <div
+            className="m--modal-backdrop"
+            onClick={() => setPreviewImage(null)}
+          ></div>
 
+          <div className="m--modal-container" style={{ maxWidth: "800px" }}>
+            <div className="m--modal-header">
+              <h2 className="m--modal-title">Preview</h2>
+              <button
+                className="m--modal-close-btn"
+                onClick={() => setPreviewImage(null)}
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="m--modal-body" style={{ textAlign: "center" }}>
+              <img
+                src={previewImage}
+                alt="Preview"
+                style={{
+                  width: "100%",
+                  maxHeight: "500px",
+                  objectFit: "contain",
+                  borderRadius: "8px",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <DeleteConfirmModal
         isOpen={showDeleteModal}
         onClose={() => {
