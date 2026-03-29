@@ -174,15 +174,27 @@ const Banner = () => {
                     >
                       <span className="material-symbols-outlined">delete</span>
                     </button>
-                    <span className="m--card-date">
-                      <span className="material-symbols-outlined">
-                        calendar_month
+                    {banner.startDate && (
+                      <span className="m--card-date">
+                        <span className="material-symbols-outlined">
+                          calendar_month
+                        </span>
+                        {banner.startDate
+                          ? new Date(banner.startDate).toLocaleString()
+                          : "--"}
                       </span>
-                      {banner.createdAt
-                        ? new Date(banner.createdAt).toLocaleDateString()
-                        : "Recent"}
-                    </span>
-
+                    )}
+                    {banner.endDate && (
+                      <span className="m--card-date">
+                        <span className="material-symbols-outlined">
+                          calendar_month
+                        </span>
+                        {banner.endDate
+                          ? new Date(banner.endDate).toLocaleString()
+                          : "--"}
+                      </span>
+                    )}
+                    <div></div>
                     <label className="m--switch">
                       <input
                         type="checkbox"
