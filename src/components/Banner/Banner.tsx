@@ -5,6 +5,7 @@ import {
   useGetAllBannersQuery,
   useCreateBannerMutation,
   useDeleteBannerMutation,
+  useUpdateBannerStatusMutation,
 } from "@/redux/api/bannerApi";
 import { toast } from "react-toastify"; // React-Toastify import kiya
 import DeleteConfirmModal from "./DeleteConfirmModal";
@@ -19,6 +20,8 @@ const Banner = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   // RTK Query Hooks
   const { data: banners, isLoading, isError } = useGetAllBannersQuery({});
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [updateBannerStatus] = useUpdateBannerStatusMutation();
   const [createBanner, { isLoading: isCreating }] = useCreateBannerMutation();
   const [deleteBanner] = useDeleteBannerMutation();
   const [startDate, setStartDate] = useState("");
@@ -70,6 +73,23 @@ const Banner = () => {
     }
   };
 
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "ACTIVE" ? "BLOCKED" : "ACTIVE";
+
+    try {
+      setUpdatingId(id);
+
+      await updateBannerStatus({ id, status: newStatus }).unwrap();
+
+      toast.success(
+        `Banner ${newStatus === "ACTIVE" ? "activated" : "blocked"} successfully`,
+      );
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update status");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
   const handleDelete = async () => {
     if (!deleteId) return;
 
@@ -163,6 +183,54 @@ const Banner = () => {
                       ? new Date(banner.createdAt).toLocaleDateString()
                       : "Recent"}
                   </span>
+                  {/* <button
+                    onClick={() =>
+                      handleToggleStatus(banner._id || banner.id, banner.status)
+                    }
+                    disabled={updatingId === (banner._id || banner.id)}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: "20px",
+                      border: "none",
+                      cursor:
+                        updatingId === (banner._id || banner.id)
+                          ? "not-allowed"
+                          : "pointer",
+                      fontSize: "12px",
+                      backgroundColor:
+                        banner.status === "ACTIVE" ? "#d4edda" : "#f8d7da",
+                      color: banner.status === "ACTIVE" ? "#155724" : "#721c24",
+                      opacity:
+                        updatingId === (banner._id || banner.id) ? 0.6 : 1,
+                    }}
+                  >
+                    {updatingId === (banner._id || banner.id) ? (
+                      <span
+                        className="material-symbols-outlined"
+                        style={{ fontSize: "14px" }}
+                      >
+                        hourglass_top
+                      </span>
+                    ) : banner.status === "ACTIVE" ? (
+                      "Active"
+                    ) : (
+                      "Blocked"
+                    )}
+                  </button> */}
+                  <label className="m--switch">
+                    <input
+                      type="checkbox"
+                      checked={banner.status === "ACTIVE"}
+                      onChange={() =>
+                        handleToggleStatus(
+                          banner._id || banner.id,
+                          banner.status,
+                        )
+                      }
+                      disabled={updatingId === (banner._id || banner.id)}
+                    />
+                    <span className="m--slider"></span>
+                  </label>
                 </div>
               </div>
             </div>

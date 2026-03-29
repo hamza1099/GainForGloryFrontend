@@ -38,6 +38,25 @@ const BannerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["banner"],
     }),
+
+    // ==============================
+    // ✅ Update banner status
+    // PATCH /banner/status/:id
+    // ==============================
+    updateBannerStatus: build.mutation({
+      query: ({
+        id,
+        status,
+      }: {
+        id: string;
+        status: "ACTIVE" | "BLOCKED";
+      }) => ({
+        url: `/banner/status/${id}`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["banner"],
+    }),
   }),
 });
 
@@ -45,6 +64,7 @@ export const {
   useGetAllBannersQuery,
   useCreateBannerMutation,
   useDeleteBannerMutation,
+  useUpdateBannerStatusMutation,
 } = BannerApi;
 
 export default BannerApi;

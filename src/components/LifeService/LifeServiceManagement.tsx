@@ -15,7 +15,7 @@ import DeleteConfirmModal from "./DeleteConfirmModal"
 
 const LifeServiceManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const limit = 1;
+  const limit = 10;
 
   // API Hooks
   const {
