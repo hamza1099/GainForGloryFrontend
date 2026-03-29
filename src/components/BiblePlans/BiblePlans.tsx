@@ -19,6 +19,7 @@ import "react-toastify/dist/ReactToastify.css";
 // ==========================================
 
 export interface DayPlan {
+  id?: string;
   title: string;
   devotionalText: string;
   reflectionQuestion: string;
@@ -161,7 +162,10 @@ const BiblePlans: React.FC = () => {
     value: string,
   ) => {
     const newDays = [...formData.days];
-    newDays[index][field] = value;
+    newDays[index] = {
+      ...newDays[index], // 🔥 keep id safe
+      [field]: value,
+    };
     setFormData({ ...formData, days: newDays });
   };
 
@@ -196,6 +200,7 @@ const BiblePlans: React.FC = () => {
       }
     }
     const cleanedDays = formData.days.map((day) => ({
+      id: day.id,
       title: day.title,
       devotionalText: day.devotionalText,
       reflectionQuestion: day.reflectionQuestion,
@@ -360,7 +365,13 @@ const BiblePlans: React.FC = () => {
               <div className="hm--hero-content">
                 <div>
                   <span className="hm--hero-badge">Recommended for you</span>
-                  <h1 className="hm--hero-title">This Weeks Bible Plan</h1>
+                  <h1 className="hm--hero-title">
+                    <span className="hm--hero-subtitle">
+                      This Week’s Bible Plan
+                    </span>
+                    <br />
+                    <span className="hm--hero-main">{featuredPlan?.title}</span>
+                  </h1>
                 </div>
               </div>
             </div>
