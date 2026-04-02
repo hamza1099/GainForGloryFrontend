@@ -448,8 +448,8 @@ export const navigation = [
     ),
   },
   {
-    label: "Live Groups",
-    route: "/live-group",
+    label: "Life Groups",
+    route: "/life-group",
     iconPath: (
       <svg
         // className="w-6 h-6 text-gray-800 dark:text-white"
@@ -587,8 +587,8 @@ export const navigation = [
     ),
   },
   {
-    label: "Life Service",
-    route: "/life-service",
+    label: "Live Service",
+    route: "/live-service",
     iconPath: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
